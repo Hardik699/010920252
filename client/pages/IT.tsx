@@ -154,6 +154,7 @@ export default function ITPage() {
   const [notes, setNotes] = useState("");
   const [availableSystemIds, setAvailableSystemIds] = useState<string[]>([]);
   const [providerIds, setProviderIds] = useState<string[]>([]);
+  const [pcPreview, setPcPreview] = useState<any | null>(null);
   const [isPreFilled, setIsPreFilled] = useState(false);
 
   useEffect(() => {
@@ -166,7 +167,7 @@ export default function ITPage() {
   // Load provider IDs from System Info assets
   useEffect(() => {
     const raw = localStorage.getItem(STORAGE_KEY);
-    const assets = raw ? JSON.parse(raw) as any[] : [];
+    const assets = raw ? (JSON.parse(raw) as any[]) : [];
     const ids = assets
       .filter((a) => (provider === "vonage" ? a.category === "vonage" : a.category === "vitel" || a.category === "vitel-global"))
       .map((a) => {
@@ -175,9 +176,20 @@ export default function ITPage() {
       })
       .filter((x) => typeof x === "string" && x.trim());
     setProviderIds(ids);
-    // Clear selected id if it no longer exists
     setVitel((s) => ({ id: ids.includes(s.id) ? s.id : "" }));
   }, [provider]);
+
+  // Auto-load PC/Laptop details when System ID changes
+  useEffect(() => {
+    if (!systemId) {
+      setPcPreview(null);
+      return;
+    }
+    const raw = localStorage.getItem("pcLaptopAssets");
+    const list = raw ? (JSON.parse(raw) as any[]) : [];
+    const found = list.find((x) => x.id === systemId) || null;
+    setPcPreview(found);
+  }, [systemId]);
 
   const availableTables = useMemo(
     () => Array.from({ length: 32 }, (_, i) => String(i + 1)),
@@ -357,6 +369,20 @@ export default function ITPage() {
                     )}
                   </SelectContent>
                 </Select>
+                {pcPreview && (
+                  <div className="mt-2 p-3 rounded border border-slate-700 bg-slate-800/30 text-slate-300 text-sm">
+                    <div className="font-medium text-white mb-1">PC/Laptop Preview: {pcPreview.id}</div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                      <div>Mouse: {pcPreview.mouseId || "-"}</div>
+                      <div>Keyboard: {pcPreview.keyboardId || "-"}</div>
+                      <div>Motherboard: {pcPreview.motherboardId || "-"}</div>
+                      <div>Camera: {pcPreview.cameraId || "-"}</div>
+                      <div>Headphone: {pcPreview.headphoneId || "-"}</div>
+                      <div>Power Supply: {pcPreview.powerSupplyId || "-"}</div>
+                      <div>RAM: {pcPreview.ramId || "-"}</div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
