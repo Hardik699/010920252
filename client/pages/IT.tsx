@@ -477,15 +477,38 @@ export default function ITPage() {
                       key={idx}
                       className="grid grid-cols-1 md:grid-cols-4 gap-2 items-center"
                     >
+                      <Select
+                        value={row.provider}
+                        onValueChange={(v) =>
+                          setEmails((r) => r.map((x, i) => (i === idx ? { ...x, provider: v } : x)))
+                        }
+                      >
+                        <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                          {[
+                            "WX",
+                            "NSIT",
+                            "LP",
+                            "MS TEMS",
+                            "OURVIN",
+                            "MOSTER",
+                            "CUSTOM",
+                          ].map((opt) => (
+                            <SelectItem key={opt} value={opt}>
+                              {opt}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <Input
                         placeholder="email@example.com"
                         value={row.email}
                         onChange={(e) => {
                           const v = e.target.value;
                           setEmails((r) =>
-                            r.map((x, i) =>
-                              i === idx ? { ...x, email: v } : x,
-                            ),
+                            r.map((x, i) => (i === idx ? { ...x, email: v } : x)),
                           );
                         }}
                         className="bg-slate-800/50 border-slate-700 text-white"
