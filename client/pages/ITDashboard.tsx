@@ -497,6 +497,7 @@ export default function ITDashboard() {
                               params.set("provider", (r as any).vitelGlobal.provider);
                             }
                             if (r.vitelGlobal?.id) params.set("providerId", r.vitelGlobal.id as string);
+                            if (r.lmPlayer?.id) params.set("lmId", r.lmPlayer.id as string);
                             window.location.href = `/it?${params.toString()}`;
                           }}
                         >
