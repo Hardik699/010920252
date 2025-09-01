@@ -79,42 +79,54 @@ export default function ITPage() {
 
   // Handle URL parameters after employees are loaded
   useEffect(() => {
-    if (employees.length > 0) {
-      // Check for URL parameters to pre-fill form
-      const urlParams = new URLSearchParams(window.location.search);
-      const preEmployeeId = urlParams.get("employeeId");
-      const preDepartment = urlParams.get("department");
-      const preTableNumber = urlParams.get("tableNumber");
-      const preSystemId = urlParams.get("systemId");
-      const preProvider = urlParams.get("provider");
-      const preProviderId = urlParams.get("providerId");
+    // Check for URL parameters to pre-fill form
+    const urlParams = new URLSearchParams(window.location.search);
+    const preEmployeeId = urlParams.get("employeeId");
+    const preDepartment = urlParams.get("department");
+    const preTableNumber = urlParams.get("tableNumber");
+    const preSystemId = urlParams.get("systemId");
+    const preProvider = urlParams.get("provider");
+    const preProviderId = urlParams.get("providerId");
+    const preLmId = urlParams.get("lmId");
+    const preLmPassword = urlParams.get("lmPassword");
 
-      if (preEmployeeId) {
-        const foundEmployee = employees.find((emp) => emp.id === preEmployeeId);
-        if (foundEmployee) {
-          setEmployeeId(preEmployeeId);
-          setDepartment(preDepartment || foundEmployee.department);
-          setTableNumber(preTableNumber || foundEmployee.tableNumber);
-          if (preSystemId) { setSystemId(preSystemId); setPreSelectedSystemId(preSystemId); }
-
-          // Provider inference
-          if (preProvider === "vonage" || preProvider === "vitel") {
-            setProvider(preProvider as any);
-          } else if (preProviderId) {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            const assets = raw ? (JSON.parse(raw) as any[]) : [];
-            const isVonage = assets.some(
-              (a) => a.category === "vonage" && (a.vonageExtCode === preProviderId || a.vonageNumber === preProviderId || a.id === preProviderId),
-            );
-            setProvider(isVonage ? ("vonage" as any) : ("vitel" as any));
-          }
-
-          if (preProviderId) { setVitel({ id: preProviderId }); setPreSelectedProviderId(preProviderId); }
-          setIsPreFilled(true);
-
-          window.history.replaceState({}, document.title, window.location.pathname);
-        }
+    // Prefill employee-related fields when employees are available
+    if (preEmployeeId && employees.length > 0) {
+      const foundEmployee = employees.find((emp) => emp.id === preEmployeeId);
+      if (foundEmployee) {
+        setEmployeeId(preEmployeeId);
+        setDepartment(preDepartment || foundEmployee.department);
+        setTableNumber(preTableNumber || foundEmployee.tableNumber);
+      } else {
+        setEmployeeId(preEmployeeId);
+        if (preDepartment) setDepartment(preDepartment);
+        if (preTableNumber) setTableNumber(preTableNumber);
       }
+    }
+
+    if (preSystemId) { setSystemId(preSystemId); setPreSelectedSystemId(preSystemId); }
+
+    // Provider inference
+    if (preProvider === "vonage" || preProvider === "vitel") {
+      setProvider(preProvider as any);
+    } else if (preProviderId) {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const assets = raw ? (JSON.parse(raw) as any[]) : [];
+      const isVonage = assets.some(
+        (a) => a.category === "vonage" && (a.vonageExtCode === preProviderId || a.vonageNumber === preProviderId || a.id === preProviderId),
+      );
+      setProvider(isVonage ? ("vonage" as any) : ("vitel" as any));
+    }
+
+    if (preProviderId) { setVitel({ id: preProviderId }); setPreSelectedProviderId(preProviderId); }
+
+    // LM Player prefill
+    if (preLmId) setLm((s) => ({ ...s, id: preLmId }));
+    if (preLmPassword) setLm((s) => ({ ...s, password: preLmPassword }));
+
+    if (preEmployeeId || preSystemId || preProvider || preProviderId || preLmId || preLmPassword) {
+      setIsPreFilled(true);
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [employees]);
 
