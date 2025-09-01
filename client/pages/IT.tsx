@@ -194,6 +194,19 @@ export default function ITPage() {
       createdAt: new Date().toISOString(),
     };
     saveRecords([rec, ...records]);
+
+    // Mark related pending IT notification as processed
+    const allNotifications = JSON.parse(
+      localStorage.getItem("pendingITNotifications") || "[]",
+    );
+    const updatedNotifications = allNotifications.map((n: any) =>
+      n.employeeId === employeeId ? { ...n, processed: true } : n,
+    );
+    localStorage.setItem(
+      "pendingITNotifications",
+      JSON.stringify(updatedNotifications),
+    );
+
     // reset minimal
     setSystemId("");
     setEmails([{ email: "", password: "" }]);
