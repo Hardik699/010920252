@@ -146,7 +146,7 @@ export default function ITPage() {
   const [tableNumber, setTableNumber] = useState<string>("");
   const [department, setDepartment] = useState<string>("");
   const [emails, setEmails] = useState<EmailCred[]>([
-    { email: "", password: "" },
+    { provider: "CUSTOM", email: "", password: "" },
   ]);
   const [provider, setProvider] = useState<"vitel" | "vonage">("vitel");
   const [vitel, setVitel] = useState({ id: "" });
