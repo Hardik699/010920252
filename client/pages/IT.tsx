@@ -220,6 +220,11 @@ export default function ITPage() {
     [],
   );
 
+  const hasAssignedTable = useMemo(
+    () => !!((employee?.tableNumber && String(employee.tableNumber).trim()) || (tableNumber && String(tableNumber).trim())),
+    [employee, tableNumber],
+  );
+
   const addEmailRow = () =>
     setEmails((rows) => [...rows, { provider: "CUSTOM", providerCustom: "", email: "", password: "" }]);
   const removeEmailRow = (idx: number) =>
@@ -433,7 +438,7 @@ export default function ITPage() {
                 )}
               </div>
 
-              {!(employee?.tableNumber || (isPreFilled && tableNumber)) && (
+              {!hasAssignedTable && (
                 <div className="space-y-2">
                   <Label className="text-slate-300">Table Number</Label>
                   <Select value={tableNumber} onValueChange={setTableNumber}>
