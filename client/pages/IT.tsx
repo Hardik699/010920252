@@ -85,22 +85,22 @@ export default function ITPage() {
       const preEmployeeId = urlParams.get("employeeId");
       const preDepartment = urlParams.get("department");
       const preTableNumber = urlParams.get("tableNumber");
+      const preSystemId = urlParams.get("systemId");
+      const preProvider = urlParams.get("provider");
+      const preProviderId = urlParams.get("providerId");
 
       if (preEmployeeId) {
-        // Verify the employee exists in the loaded data
         const foundEmployee = employees.find((emp) => emp.id === preEmployeeId);
         if (foundEmployee) {
           setEmployeeId(preEmployeeId);
           setDepartment(preDepartment || foundEmployee.department);
           setTableNumber(preTableNumber || foundEmployee.tableNumber);
+          if (preSystemId) setSystemId(preSystemId);
+          if (preProvider === "vonage" || preProvider === "vitel") setProvider(preProvider as any);
+          if (preProviderId) setVitel({ id: preProviderId });
           setIsPreFilled(true);
 
-          // Clear URL parameters after loading to clean up the URL
-          window.history.replaceState(
-            {},
-            document.title,
-            window.location.pathname,
-          );
+          window.history.replaceState({}, document.title, window.location.pathname);
         }
       }
     }
