@@ -203,7 +203,8 @@ export default function ITPage() {
     // reset minimal
     setSystemId("");
     setEmails([{ email: "", password: "" }]);
-    setVitel({ id: "", password: "", type: "extension", extNumber: "" });
+    setProvider("vitel");
+    setVitel({ id: "" });
     setLm({ id: "", password: "", license: "standard" });
     setNotes("");
     alert("Saved");
