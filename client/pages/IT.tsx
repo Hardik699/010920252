@@ -95,7 +95,7 @@ export default function ITPage() {
           setEmployeeId(preEmployeeId);
           setDepartment(preDepartment || foundEmployee.department);
           setTableNumber(preTableNumber || foundEmployee.tableNumber);
-          if (preSystemId) setSystemId(preSystemId);
+          if (preSystemId) { setSystemId(preSystemId); setPreSelectedSystemId(preSystemId); }
           if (preProvider === "vonage" || preProvider === "vitel") setProvider(preProvider as any);
           if (preProviderId) setVitel({ id: preProviderId });
           setIsPreFilled(true);
