@@ -42,6 +42,7 @@ import {
   Activity,
   Bell,
   Settings,
+  Edit,
 } from "lucide-react";
 
 interface ITRecord {
