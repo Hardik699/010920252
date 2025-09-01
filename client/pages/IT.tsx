@@ -259,18 +259,29 @@ export default function ITPage() {
             >
               <div className="space-y-2">
                 <Label className="text-slate-300">Employee Name</Label>
-                <Select value={employeeId} onValueChange={setEmployeeId}>
-                  <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
-                    <SelectValue placeholder="Select employee" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
-                    {employees.map((e) => (
-                      <SelectItem key={e.id} value={e.id}>
-                        {e.fullName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {isPreFilled && employeeId ? (
+                  <>
+                    <Input
+                      value={employee?.fullName || ""}
+                      disabled
+                      className="bg-slate-800/50 border-slate-700 text-white"
+                    />
+                    <input type="hidden" value={employeeId} />
+                  </>
+                ) : (
+                  <Select value={employeeId} onValueChange={setEmployeeId}>
+                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                      <SelectValue placeholder="Select employee" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                      {employees.map((e) => (
+                        <SelectItem key={e.id} value={e.id}>
+                          {e.fullName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -324,34 +335,50 @@ export default function ITPage() {
 
               <div className="space-y-2">
                 <Label className="text-slate-300">Department</Label>
-                <Select value={department} onValueChange={setDepartment}>
-                  <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
-                    <SelectValue placeholder="Select department" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
-                    {departments.map((d) => (
-                      <SelectItem key={d.id} value={d.name}>
-                        {d.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {isPreFilled ? (
+                  <Input
+                    value={department}
+                    disabled
+                    className="bg-slate-800/50 border-slate-700 text-white"
+                  />
+                ) : (
+                  <Select value={department} onValueChange={setDepartment}>
+                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                      <SelectValue placeholder="Select department" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                      {departments.map((d) => (
+                        <SelectItem key={d.id} value={d.name}>
+                          {d.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
 
               <div className="space-y-2">
                 <Label className="text-slate-300">Table Number</Label>
-                <Select value={tableNumber} onValueChange={setTableNumber}>
-                  <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
-                    <SelectValue placeholder="Select table (1-32)" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
-                    {availableTables.map((n) => (
-                      <SelectItem key={n} value={n}>
-                        {n}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {isPreFilled ? (
+                  <Input
+                    value={tableNumber}
+                    disabled
+                    className="bg-slate-800/50 border-slate-700 text-white"
+                  />
+                ) : (
+                  <Select value={tableNumber} onValueChange={setTableNumber}>
+                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                      <SelectValue placeholder="Select table (1-32)" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                      {availableTables.map((n) => (
+                        <SelectItem key={n} value={n}>
+                          {n}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
 
               {/* Emails */}
