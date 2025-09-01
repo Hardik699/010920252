@@ -484,25 +484,23 @@ export default function ITPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                {provider === "vonage" && (
-                  <div className="space-y-2 md:col-span-2">
-                    <Label className="text-slate-300">Vonage ID</Label>
-                    <Select value={vitel.id} onValueChange={(v) => setVitel({ id: v })}>
-                      <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
-                        <SelectValue placeholder={providerIds.length ? "Select ID" : "No IDs found in System Info"} />
-                      </SelectTrigger>
-                      <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
-                        {providerIds.length === 0 ? (
-                          <div className="px-3 py-2 text-slate-400">Add Vonage IDs in System Info</div>
-                        ) : (
-                          providerIds.map((id) => (
-                            <SelectItem key={id} value={id}>{id}</SelectItem>
-                          ))
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
+                <div className="space-y-2 md:col-span-2">
+                  <Label className="text-slate-300">{provider === "vonage" ? "Vonage ID" : "Vitel Global ID"}</Label>
+                  <Select value={vitel.id} onValueChange={(v) => setVitel({ id: v })}>
+                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                      <SelectValue placeholder={providerIds.length ? "Select ID" : "No IDs found in System Info"} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                      {providerIds.length === 0 ? (
+                        <div className="px-3 py-2 text-slate-400">Add {provider === "vonage" ? "Vonage" : "Vitel Global"} IDs in System Info</div>
+                      ) : (
+                        providerIds.map((id) => (
+                          <SelectItem key={id} value={id}>{id}</SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               {/* LM Player */}
@@ -603,9 +601,9 @@ export default function ITPage() {
                           {r.emails.map((e) => e.email).join(", ")}
                         </TableCell>
                         <TableCell>
-                          {((r as any).vitelGlobal?.provider === "vonage")
-                            ? (r.vitelGlobal?.id ? `Vonage: ${r.vitelGlobal.id}` : "-")
-                            : (r.vitelGlobal ? "Vitel Global" : "-")}
+                          {r.vitelGlobal?.id
+                            ? `${((r as any).vitelGlobal?.provider === "vonage" ? "Vonage" : ((r as any).vitelGlobal?.provider ? "Vitel Global" : (r as any).vitelGlobal?.type || "Vitel Global"))}: ${r.vitelGlobal.id}`
+                            : "-"}
                         </TableCell>
                         <TableCell>{r.lmPlayer.id || "-"}</TableCell>
                         <TableCell>
