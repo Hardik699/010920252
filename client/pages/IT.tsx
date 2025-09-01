@@ -160,8 +160,8 @@ export default function ITPage() {
 
   useEffect(() => {
     if (employee) {
-      setDepartment(employee.department || department);
-      setTableNumber(employee.tableNumber || tableNumber);
+      setDepartment(employee.department || "");
+      if (employee.tableNumber) setTableNumber(String(employee.tableNumber));
     }
   }, [employee]);
 
@@ -219,6 +219,19 @@ export default function ITPage() {
     () => Array.from({ length: 32 }, (_, i) => String(i + 1)),
     [],
   );
+
+  const usedTables = useMemo(() => {
+    return new Set(
+      employees
+        .filter((e) => e.status === "active" && e.tableNumber)
+        .map((e) => String(e.tableNumber)),
+    );
+  }, [employees]);
+
+  const filteredTables = useMemo(() => {
+    const keep = String(employee?.tableNumber || "");
+    return availableTables.filter((n) => (keep && n === keep) || !usedTables.has(n));
+  }, [availableTables, usedTables, employee]);
 
   const hasAssignedTable = useMemo(
     () => !!((employee?.tableNumber && String(employee.tableNumber).trim()) || (tableNumber && String(tableNumber).trim())),
@@ -446,7 +459,7 @@ export default function ITPage() {
                       <SelectValue placeholder="Select table (1-32)" />
                     </SelectTrigger>
                     <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
-                      {availableTables.map((n) => (
+                      {filteredTables.map((n) => (
                         <SelectItem key={n} value={n}>
                           {n}
                         </SelectItem>
