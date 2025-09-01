@@ -477,17 +477,7 @@ export default function ITPage() {
                       key={idx}
                       className="grid grid-cols-1 md:grid-cols-4 gap-2 items-center"
                     >
-                      {row.provider === "CUSTOM" ? (
-                        <Input
-                          placeholder="Custom provider"
-                          value={row.providerCustom || ""}
-                          onChange={(e) => {
-                            const v = e.target.value;
-                            setEmails((r) => r.map((x, i) => (i === idx ? { ...x, providerCustom: v } : x)));
-                          }}
-                          className="bg-slate-800/50 border-slate-700 text-white"
-                        />
-                      ) : (
+                      <div className="space-y-2">
                         <Select
                           value={row.provider}
                           onValueChange={(v) =>
@@ -513,7 +503,18 @@ export default function ITPage() {
                             ))}
                           </SelectContent>
                         </Select>
-                      )}
+                        {row.provider === "CUSTOM" && (
+                          <Input
+                            placeholder="Custom provider"
+                            value={row.providerCustom || ""}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              setEmails((r) => r.map((x, i) => (i === idx ? { ...x, providerCustom: v } : x)));
+                            }}
+                            className="bg-slate-800/50 border-slate-700 text-white"
+                          />
+                        )}
+                      </div>
                       <Input
                         placeholder="email@example.com"
                         value={row.email}
