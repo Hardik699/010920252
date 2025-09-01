@@ -49,9 +49,7 @@ interface ITRecord {
   emails: EmailCred[];
   vitelGlobal: {
     id: string;
-    password: string;
-    type: string;
-    extNumber?: string;
+    provider: "vitel" | "vonage";
   };
   lmPlayer: { id: string; password: string; license: string };
   notes?: string;
