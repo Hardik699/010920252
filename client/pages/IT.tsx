@@ -156,6 +156,11 @@ export default function ITPage() {
     }
   };
 
+  // Ensure the pre-selected System ID is present in options after URL parsing
+  useEffect(() => {
+    loadAvailableSystemIds();
+  }, [preSelectedSystemId]);
+
   const saveRecords = (next: ITRecord[]) => {
     setRecords(next);
     localStorage.setItem("itAccounts", JSON.stringify(next));
