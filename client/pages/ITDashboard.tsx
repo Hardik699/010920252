@@ -569,15 +569,7 @@ export default function ITDashboard() {
                                 <Button
                                   className="bg-blue-500 hover:bg-blue-600 text-white"
                                   onClick={() => {
-                                    const params = new URLSearchParams({
-                                      employeeId: r.employeeId,
-                                      department: r.department,
-                                      tableNumber: r.tableNumber,
-                                      systemId: r.systemId,
-                                    });
-                                    if ((r as any).vitelGlobal?.provider) params.set("provider", (r as any).vitelGlobal.provider as string);
-                                    if (r.vitelGlobal?.id) params.set("providerId", r.vitelGlobal.id as string);
-                                    if (r.lmPlayer?.id) params.set("lmId", r.lmPlayer.id as string);
+                                    const params = new URLSearchParams({ itId: r.id });
                                     window.location.href = `/it?${params.toString()}`;
                                   }}
                                 >
