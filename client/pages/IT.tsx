@@ -263,7 +263,7 @@ export default function ITPage() {
 
     // reset minimal
     setSystemId("");
-    setEmails([{ email: "", password: "" }]);
+    setEmails([{ provider: "CUSTOM", email: "", password: "" }]);
     setProvider("vitel");
     setVitel({ id: "" });
     setLm({ id: "", password: "", license: "standard" });
