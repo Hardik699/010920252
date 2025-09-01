@@ -11,6 +11,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -42,6 +49,7 @@ import {
   Activity,
   Bell,
   Settings,
+  Eye,
 } from "lucide-react";
 
 interface ITRecord {
@@ -458,6 +466,7 @@ export default function ITDashboard() {
                     <TableHead>Provider</TableHead>
                     <TableHead>Provider ID</TableHead>
                     <TableHead>LM Player</TableHead>
+                    <TableHead>Preview</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -479,6 +488,57 @@ export default function ITDashboard() {
                       </TableCell>
                       <TableCell>{r.vitelGlobal?.id || "-"}</TableCell>
                       <TableCell>{r.lmPlayer.id || "-"}</TableCell>
+                      <TableCell>
+                        <Sheet>
+                          <SheetTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                            >
+                              <Eye className="h-4 w-4 mr-1" /> Preview
+                            </Button>
+                          </SheetTrigger>
+                          <SheetContent className="bg-slate-900 border-slate-700 text-white w-[420px] sm:w-[540px]">
+                            <SheetHeader>
+                              <SheetTitle className="text-white">IT Account Preview</SheetTitle>
+                            </SheetHeader>
+                            <div className="mt-4 space-y-3 text-sm text-slate-300">
+                              <div className="grid grid-cols-2 gap-2">
+                                <div className="text-slate-400">Employee</div>
+                                <div className="text-white font-medium">{r.employeeName}</div>
+                                <div className="text-slate-400">Department</div>
+                                <div>{r.department}</div>
+                                <div className="text-slate-400">System ID</div>
+                                <div>{r.systemId}</div>
+                                <div className="text-slate-400">Table</div>
+                                <div>{r.tableNumber}</div>
+                                <div className="text-slate-400">Provider</div>
+                                <div>{r.vitelGlobal?.id ? ((r as any).vitelGlobal?.provider === "vonage" ? "Vonage" : "Vitel Global") : "-"}</div>
+                                <div className="text-slate-400">Provider ID</div>
+                                <div>{r.vitelGlobal?.id || "-"}</div>
+                                <div className="text-slate-400">LM Player</div>
+                                <div>{r.lmPlayer?.id || "-"}</div>
+                                <div className="text-slate-400">License</div>
+                                <div>{r.lmPlayer?.license || "-"}</div>
+                              </div>
+                              <div>
+                                <div className="text-slate-400 mb-1">Emails</div>
+                                <div className="rounded border border-slate-700 bg-slate-800/30 p-2 text-xs">
+                                  {(r.emails || []).length ? (r.emails || []).map((e) => e.email).join(", ") : "-"}
+                                </div>
+                              </div>
+                              {r.notes && (
+                                <div>
+                                  <div className="text-slate-400 mb-1">Notes</div>
+                                  <div className="rounded border border-slate-700 bg-slate-800/30 p-2 text-xs whitespace-pre-wrap">{r.notes}</div>
+                                </div>
+                              )}
+                              <div className="text-xs text-slate-500">Created: {new Date(r.createdAt).toLocaleString()}</div>
+                            </div>
+                          </SheetContent>
+                        </Sheet>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
