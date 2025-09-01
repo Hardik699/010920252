@@ -459,6 +459,7 @@ export default function ITDashboard() {
                     <TableHead>Provider</TableHead>
                     <TableHead>Provider ID</TableHead>
                     <TableHead>LM Player</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
