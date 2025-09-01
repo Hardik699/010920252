@@ -38,7 +38,7 @@ interface Department {
   name: string;
 }
 
-type EmailCred = { email: string; password: string };
+type EmailCred = { provider: string; email: string; password: string };
 
 interface ITRecord {
   id: string;
