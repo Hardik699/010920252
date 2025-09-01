@@ -557,7 +557,7 @@ export default function ITPage() {
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                           <div>Ext: {providerPreview?.vonageExtCode || "-"}</div>
                           <div>Number: {providerPreview?.vonageNumber || "-"}</div>
-                          <div>Password: {providerPreview?.vonagePassword ? "••••••" : "-"}</div>
+                          <div>Password: {providerPreview?.vonagePassword || "-"}</div>
                           <div>ID: {providerPreview?.id || "-"}</div>
                         </div>
                       ) : (
