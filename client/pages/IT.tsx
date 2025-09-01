@@ -121,9 +121,12 @@ export default function ITPage() {
         : [];
 
       // Filter out assigned IDs to show only available ones
-      const available = pcLaptopIds.filter(
+      let available = pcLaptopIds.filter(
         (id: string) => !assignedIds.includes(id),
       );
+      if (preSelectedSystemId && !available.includes(preSelectedSystemId) && pcLaptopIds.includes(preSelectedSystemId)) {
+        available = [preSelectedSystemId, ...available];
+      }
       setAvailableSystemIds(available);
     }
   };
