@@ -439,41 +439,25 @@ export default function ITPage() {
                 </div>
               </div>
 
-              {/* Vitel Global */}
+              {/* Telephony Provider */}
               <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-slate-300">
-                    Vitel Extension Number
-                  </Label>
-                  <Input
-                    value={vitel.extNumber}
-                    onChange={(e) =>
-                      setVitel((s) => ({ ...s, extNumber: e.target.value }))
-                    }
-                    className="bg-slate-800/50 border-slate-700 text-white"
-                    placeholder="e.g. 101"
-                  />
+                  <Label className="text-slate-300">Provider</Label>
+                  <Select value={provider} onValueChange={(v) => setProvider(v as any)}>
+                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800 border-slate-700 text-white">
+                      <SelectItem value="vitel">Vitel Global</SelectItem>
+                      <SelectItem value="vonage">Vonage</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-slate-300">Vitel Global ID</Label>
+                <div className="space-y-2 md:col-span-2">
+                  <Label className="text-slate-300">{provider === "vonage" ? "Vonage ID" : "Vitel Global ID"}</Label>
                   <Input
                     value={vitel.id}
-                    onChange={(e) =>
-                      setVitel((s) => ({ ...s, id: e.target.value }))
-                    }
-                    className="bg-slate-800/50 border-slate-700 text-white"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-slate-300">
-                    Vitel Global Password
-                  </Label>
-                  <Input
-                    type="password"
-                    value={vitel.password}
-                    onChange={(e) =>
-                      setVitel((s) => ({ ...s, password: e.target.value }))
-                    }
+                    onChange={(e) => setVitel((s) => ({ ...s, id: e.target.value }))}
                     className="bg-slate-800/50 border-slate-700 text-white"
                   />
                 </div>
