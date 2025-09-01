@@ -52,7 +52,6 @@ import {
   Bell,
   Settings,
   Eye,
-  Eye,
   Pencil,
 } from "lucide-react";
 
