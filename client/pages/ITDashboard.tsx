@@ -42,7 +42,6 @@ import {
   Activity,
   Bell,
   Settings,
-  Edit,
 } from "lucide-react";
 
 interface ITRecord {
@@ -459,7 +458,6 @@ export default function ITDashboard() {
                     <TableHead>Provider</TableHead>
                     <TableHead>Provider ID</TableHead>
                     <TableHead>LM Player</TableHead>
-                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -481,29 +479,6 @@ export default function ITDashboard() {
                       </TableCell>
                       <TableCell>{r.vitelGlobal?.id || "-"}</TableCell>
                       <TableCell>{r.lmPlayer.id || "-"}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="border-slate-600 text-slate-300 hover:bg-slate-700"
-                          onClick={() => {
-                            const params = new URLSearchParams({
-                              employeeId: r.employeeId,
-                              department: r.department,
-                              tableNumber: r.tableNumber,
-                              systemId: r.systemId,
-                            });
-                            if ((r as any).vitelGlobal?.provider) {
-                              params.set("provider", (r as any).vitelGlobal.provider);
-                            }
-                            if (r.vitelGlobal?.id) params.set("providerId", r.vitelGlobal.id as string);
-                            if (r.lmPlayer?.id) params.set("lmId", r.lmPlayer.id as string);
-                            window.location.href = `/it?${params.toString()}`;
-                          }}
-                        >
-                          <Edit className="h-4 w-4 mr-1" /> Edit
-                        </Button>
-                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
