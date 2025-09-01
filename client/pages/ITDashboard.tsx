@@ -473,11 +473,15 @@ export default function ITDashboard() {
                         {r.emails.map((e) => e.email).join(", ") || "-"}
                       </TableCell>
                       <TableCell>
-                        {r.vitelGlobal?.id
-                          ? ((r as any).vitelGlobal?.provider === "vonage" ? "Vonage" : "Vitel Global")
+                        {r.vitelGlobal?.provider === "vonage"
+                          ? "Vonage"
+                          : r.vitelGlobal
+                          ? "Vitel Global"
                           : "-"}
                       </TableCell>
-                      <TableCell>{r.vitelGlobal?.id || "-"}</TableCell>
+                      <TableCell>
+                        {r.vitelGlobal?.provider === "vonage" ? r.vitelGlobal?.id || "-" : "-"}
+                      </TableCell>
                       <TableCell>{r.lmPlayer.id || "-"}</TableCell>
                     </TableRow>
                   ))}
