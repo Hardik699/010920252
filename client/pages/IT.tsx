@@ -79,8 +79,33 @@ export default function ITPage() {
 
   // Handle URL parameters after employees are loaded
   useEffect(() => {
-    // Check for URL parameters to pre-fill form
     const urlParams = new URLSearchParams(window.location.search);
+    const preItId = urlParams.get("itId") || "";
+
+    // If editing an existing IT record by id, load everything
+    if (preItId) {
+      const itsRaw = localStorage.getItem("itAccounts");
+      const all: ITRecord[] = itsRaw ? JSON.parse(itsRaw) : [];
+      const rec = all.find((x) => x.id === preItId);
+      if (rec) {
+        setEmployeeId(rec.employeeId);
+        setDepartment(rec.department);
+        setTableNumber(rec.tableNumber);
+        setSystemId(rec.systemId);
+        setPreSelectedSystemId(rec.systemId);
+        setEmails(rec.emails && rec.emails.length ? rec.emails : [{ provider: "CUSTOM", providerCustom: "", email: "", password: "" }]);
+        setProvider((rec.vitelGlobal?.provider as any) || "vitel");
+        setVitel({ id: rec.vitelGlobal?.id || "" });
+        setPreSelectedProviderId(rec.vitelGlobal?.id || "");
+        setLm({ id: rec.lmPlayer?.id || "", password: rec.lmPlayer?.password || "", license: rec.lmPlayer?.license || "standard" });
+        setNotes(rec.notes || "");
+        setIsPreFilled(true);
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      }
+    }
+
+    // Otherwise, fall back to param-based prefill (HR notification / partial edit)
     const preEmployeeId = urlParams.get("employeeId") || "";
     const preDepartment = urlParams.get("department") || "";
     const preTableNumber = urlParams.get("tableNumber") || "";
@@ -90,12 +115,10 @@ export default function ITPage() {
     const preLmId = urlParams.get("lmId") || "";
     const preLmPassword = urlParams.get("lmPassword") || "";
 
-    // Always set basic values from URL first
     if (preEmployeeId) setEmployeeId(preEmployeeId);
     if (preDepartment) setDepartment(preDepartment);
     if (preTableNumber) setTableNumber(preTableNumber);
 
-    // Enhance with employee defaults when available
     if (preEmployeeId && employees.length > 0) {
       const foundEmployee = employees.find((emp) => emp.id === preEmployeeId);
       if (foundEmployee) {
@@ -107,7 +130,6 @@ export default function ITPage() {
 
     if (preSystemId) { setSystemId(preSystemId); setPreSelectedSystemId(preSystemId); }
 
-    // Provider inference
     if (preProvider === "vonage" || preProvider === "vitel") {
       setProvider(preProvider as any);
     } else if (preProviderId) {
@@ -121,7 +143,6 @@ export default function ITPage() {
 
     if (preProviderId) { setVitel({ id: preProviderId }); setPreSelectedProviderId(preProviderId); }
 
-    // LM Player prefill
     if (preLmId) setLm((s) => ({ ...s, id: preLmId }));
     if (preLmPassword) setLm((s) => ({ ...s, password: preLmPassword }));
 
