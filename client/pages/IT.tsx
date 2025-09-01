@@ -155,6 +155,7 @@ export default function ITPage() {
   const [availableSystemIds, setAvailableSystemIds] = useState<string[]>([]);
   const [providerIds, setProviderIds] = useState<string[]>([]);
   const [pcPreview, setPcPreview] = useState<any | null>(null);
+  const [providerPreview, setProviderPreview] = useState<any | null>(null);
   const [isPreFilled, setIsPreFilled] = useState(false);
 
   useEffect(() => {
@@ -190,6 +191,29 @@ export default function ITPage() {
     const found = list.find((x) => x.id === systemId) || null;
     setPcPreview(found);
   }, [systemId]);
+
+  // Auto-load provider details when provider ID changes
+  useEffect(() => {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const assets = raw ? (JSON.parse(raw) as any[]) : [];
+    if (!vitel.id) {
+      setProviderPreview(null);
+      return;
+    }
+    if (provider === "vonage") {
+      const match = assets.find(
+        (a) =>
+          a.category === "vonage" &&
+          (a.vonageExtCode === vitel.id || a.vonageNumber === vitel.id || a.id === vitel.id),
+      );
+      setProviderPreview(match || null);
+    } else {
+      const match = assets.find(
+        (a) => (a.category === "vitel" || a.category === "vitel-global") && a.id === vitel.id,
+      );
+      setProviderPreview(match || null);
+    }
+  }, [provider, vitel.id]);
 
   const availableTables = useMemo(
     () => Array.from({ length: 32 }, (_, i) => String(i + 1)),
@@ -526,6 +550,21 @@ export default function ITPage() {
                       )}
                     </SelectContent>
                   </Select>
+                  {providerPreview && (
+                    <div className="mt-2 p-3 rounded border border-slate-700 bg-slate-800/30 text-slate-300 text-sm">
+                      <div className="font-medium text-white mb-1">{provider === "vonage" ? "Vonage" : "Vitel Global"} Preview</div>
+                      {provider === "vonage" ? (
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                          <div>Ext: {providerPreview?.vonageExtCode || "-"}</div>
+                          <div>Number: {providerPreview?.vonageNumber || "-"}</div>
+                          <div>Password: {providerPreview?.vonagePassword ? "••••••" : "-"}</div>
+                          <div>ID: {providerPreview?.id || "-"}</div>
+                        </div>
+                      ) : (
+                        <div>ID: {providerPreview?.id || "-"}</div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
