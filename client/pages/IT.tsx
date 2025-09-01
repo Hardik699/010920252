@@ -156,10 +156,6 @@ export default function ITPage() {
     }
   };
 
-  // Ensure the pre-selected System ID is present in options after URL parsing
-  useEffect(() => {
-    loadAvailableSystemIds();
-  }, [preSelectedSystemId]);
 
   const saveRecords = (next: ITRecord[]) => {
     setRecords(next);
@@ -217,6 +213,11 @@ export default function ITPage() {
     setProviderIds(ids);
     setVitel((s) => ({ id: ids.includes(s.id) ? s.id : preSelectedProviderId || "" }));
   }, [provider, preSelectedProviderId]);
+
+  // Ensure the pre-selected System ID is present in options after URL parsing
+  useEffect(() => {
+    loadAvailableSystemIds();
+  }, [preSelectedSystemId]);
 
   // Auto-load PC/Laptop details when System ID changes
   useEffect(() => {
