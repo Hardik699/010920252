@@ -188,7 +188,7 @@ export default function ITPage() {
       tableNumber,
       department,
       emails: cleanEmails,
-      vitelGlobal: { ...vitel },
+      vitelGlobal: { id: vitel.id.trim(), provider },
       lmPlayer: { ...lm },
       notes: notes.trim() || undefined,
       createdAt: new Date().toISOString(),
