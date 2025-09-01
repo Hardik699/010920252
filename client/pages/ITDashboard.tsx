@@ -53,10 +53,11 @@ interface ITRecord {
   department: string;
   emails: { email: string; password: string }[];
   vitelGlobal: {
-    id: string;
-    password: string;
-    type: string;
+    id?: string;
+    provider?: "vitel" | "vonage";
+    type?: string;
     extNumber?: string;
+    password?: string;
   };
   lmPlayer: { id: string; password: string; license: string };
   notes?: string;
@@ -471,9 +472,8 @@ export default function ITDashboard() {
                     <TableHead>System ID</TableHead>
                     <TableHead>Table</TableHead>
                     <TableHead>Emails</TableHead>
-                    <TableHead>Vitel ID</TableHead>
-                    <TableHead>Vitel Ext</TableHead>
-                    <TableHead>Vitel Password</TableHead>
+                    <TableHead>Provider</TableHead>
+                    <TableHead>Provider ID</TableHead>
                     <TableHead>LM Player</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -490,14 +490,11 @@ export default function ITDashboard() {
                         {r.emails.map((e) => e.email).join(", ") || "-"}
                       </TableCell>
                       <TableCell>
-                        {r.vitelGlobal.id
-                          ? `${r.vitelGlobal.type}: ${r.vitelGlobal.id}`
+                        {r.vitelGlobal?.id
+                          ? ((r as any).vitelGlobal?.provider === "vonage" ? "Vonage" : "Vitel Global")
                           : "-"}
                       </TableCell>
-                      <TableCell>{r.vitelGlobal.extNumber || "-"}</TableCell>
-                      <TableCell>
-                        {r.vitelGlobal.password ? "••••••" : "-"}
-                      </TableCell>
+                      <TableCell>{r.vitelGlobal?.id || "-"}</TableCell>
                       <TableCell>{r.lmPlayer.id || "-"}</TableCell>
                     </TableRow>
                   ))}
