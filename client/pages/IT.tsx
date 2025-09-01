@@ -221,7 +221,7 @@ export default function ITPage() {
   );
 
   const addEmailRow = () =>
-    setEmails((rows) => [...rows, { email: "", password: "" }]);
+    setEmails((rows) => [...rows, { provider: "CUSTOM", email: "", password: "" }]);
   const removeEmailRow = (idx: number) =>
     setEmails((rows) => rows.filter((_, i) => i !== idx));
 
