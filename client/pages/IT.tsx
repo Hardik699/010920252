@@ -569,30 +569,12 @@ export default function ITPage() {
               </div>
 
               {/* LM Player */}
-              <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-slate-300">LM Player License</Label>
-                  <Select
-                    value={lm.license}
-                    onValueChange={(v) => setLm((s) => ({ ...s, license: v }))}
-                  >
-                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-slate-700 text-white">
-                      <SelectItem value="standard">Standard</SelectItem>
-                      <SelectItem value="pro">Pro</SelectItem>
-                      <SelectItem value="enterprise">Enterprise</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-slate-300">LM Player ID</Label>
                   <Input
                     value={lm.id}
-                    onChange={(e) =>
-                      setLm((s) => ({ ...s, id: e.target.value }))
-                    }
+                    onChange={(e) => setLm((s) => ({ ...s, id: e.target.value }))}
                     className="bg-slate-800/50 border-slate-700 text-white"
                   />
                 </div>
@@ -601,9 +583,7 @@ export default function ITPage() {
                   <Input
                     type="password"
                     value={lm.password}
-                    onChange={(e) =>
-                      setLm((s) => ({ ...s, password: e.target.value }))
-                    }
+                    onChange={(e) => setLm((s) => ({ ...s, password: e.target.value }))}
                     className="bg-slate-800/50 border-slate-700 text-white"
                   />
                 </div>
