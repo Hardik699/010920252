@@ -433,7 +433,7 @@ export default function ITPage() {
                 )}
               </div>
 
-              {!employee?.tableNumber && (
+              {!(employee?.tableNumber || (isPreFilled && tableNumber)) && (
                 <div className="space-y-2">
                   <Label className="text-slate-300">Table Number</Label>
                   <Select value={tableNumber} onValueChange={setTableNumber}>
