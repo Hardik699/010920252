@@ -114,25 +114,7 @@ export default function ITDashboard() {
   }, []);
 
   const handleProcessEmployee = (notification: PendingITNotification) => {
-    // Mark notification as processed
-    const allNotifications = JSON.parse(
-      localStorage.getItem("pendingITNotifications") || "[]",
-    );
-    const updatedNotifications = allNotifications.map(
-      (n: PendingITNotification) =>
-        n.id === notification.id ? { ...n, processed: true } : n,
-    );
-    localStorage.setItem(
-      "pendingITNotifications",
-      JSON.stringify(updatedNotifications),
-    );
-
-    // Remove from current display
-    setPendingNotifications((prev) =>
-      prev.filter((n) => n.id !== notification.id),
-    );
-
-    // Navigate to IT form with pre-filled data
+    // Do NOT mark processed here. Keep notification until IT record is created.
     const urlParams = new URLSearchParams({
       employeeId: notification.employeeId,
       employeeName: notification.employeeName,
@@ -156,8 +138,9 @@ export default function ITDashboard() {
 
   const filtered = records.filter((r) => {
     const matchDept = deptFilter === "all" || r.department === deptFilter;
+    const providerLabel = (r as any).vitelGlobal?.provider === "vonage" ? "vonage" : (r as any).vitelGlobal?.provider ? "vitel" : "vitel";
     const text =
-      `${r.employeeName} ${r.systemId} ${r.emails.map((e) => e.email).join(" ")} ${r.vitelGlobal.id || ""} ${r.vitelGlobal.extNumber || ""}`.toLowerCase();
+      `${r.employeeName} ${r.systemId} ${r.emails.map((e) => e.email).join(" ")} ${r.vitelGlobal?.id || ""} ${providerLabel}`.toLowerCase();
     const matchQuery = !query || text.includes(query.toLowerCase());
     return matchDept && matchQuery;
   });
