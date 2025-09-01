@@ -147,12 +147,8 @@ export default function ITPage() {
   const [emails, setEmails] = useState<EmailCred[]>([
     { email: "", password: "" },
   ]);
-  const [vitel, setVitel] = useState({
-    id: "",
-    password: "",
-    type: "extension",
-    extNumber: "",
-  });
+  const [provider, setProvider] = useState<"vitel" | "vonage">("vitel");
+  const [vitel, setVitel] = useState({ id: "" });
   const [lm, setLm] = useState({ id: "", password: "", license: "standard" });
   const [notes, setNotes] = useState("");
   const [availableSystemIds, setAvailableSystemIds] = useState<string[]>([]);
