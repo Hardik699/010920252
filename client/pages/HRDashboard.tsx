@@ -1085,15 +1085,20 @@ Generated on: ${new Date().toLocaleString()}
     const seeded = localStorage.getItem("demoEmployeesSeeded");
     if (seeded) return;
 
-    const savedEmployees: Employee[] = JSON.parse(localStorage.getItem("hrEmployees") || "[]");
-    const savedDepartments: Department[] = JSON.parse(localStorage.getItem("departments") || "[]");
+    const savedEmployees: Employee[] = JSON.parse(
+      localStorage.getItem("hrEmployees") || "[]",
+    );
+    const savedDepartments: Department[] = JSON.parse(
+      localStorage.getItem("departments") || "[]",
+    );
 
     if (savedEmployees.length >= 2) {
       localStorage.setItem("demoEmployeesSeeded", "1");
       return;
     }
 
-    const img = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==";
+    const img =
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==";
 
     const emp1: Employee = {
       id: `${Date.now()}-1`,
@@ -1174,15 +1179,32 @@ Generated on: ${new Date().toLocaleString()}
     saveEmployees(updatedEmployees);
 
     const deptCounts = (name: string) =>
-      updatedEmployees.filter((e) => e.department === name && e.status === "active").length;
+      updatedEmployees.filter(
+        (e) => e.department === name && e.status === "active",
+      ).length;
     if (savedDepartments.length === 0) {
       const defaultDepartments: Department[] = [
-        { id: "1", name: "Engineering", manager: "John Smith", employeeCount: 0 },
-        { id: "2", name: "Marketing", manager: "Sarah Johnson", employeeCount: 0 },
+        {
+          id: "1",
+          name: "Engineering",
+          manager: "John Smith",
+          employeeCount: 0,
+        },
+        {
+          id: "2",
+          name: "Marketing",
+          manager: "Sarah Johnson",
+          employeeCount: 0,
+        },
         { id: "3", name: "Sales", manager: "Mike Davis", employeeCount: 0 },
         { id: "4", name: "HR", manager: "Lisa Wilson", employeeCount: 0 },
         { id: "5", name: "Finance", manager: "David Brown", employeeCount: 0 },
-        { id: "6", name: "Operations", manager: "Emma Wilson", employeeCount: 0 },
+        {
+          id: "6",
+          name: "Operations",
+          manager: "Emma Wilson",
+          employeeCount: 0,
+        },
       ];
       const seededDepartments = defaultDepartments.map((d) => ({
         ...d,
@@ -1197,7 +1219,9 @@ Generated on: ${new Date().toLocaleString()}
       saveDepartments(updatedDepartments);
     }
 
-    const pending = JSON.parse(localStorage.getItem("pendingITNotifications") || "[]");
+    const pending = JSON.parse(
+      localStorage.getItem("pendingITNotifications") || "[]",
+    );
     const newNotifs = newEmployees.map((employee) => ({
       id: employee.id,
       employeeId: employee.id,

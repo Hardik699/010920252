@@ -149,7 +149,12 @@ export default function ITDashboard() {
 
   const filtered = records.filter((r) => {
     const matchDept = deptFilter === "all" || r.department === deptFilter;
-    const providerLabel = (r as any).vitelGlobal?.provider === "vonage" ? "vonage" : (r as any).vitelGlobal?.provider ? "vitel" : "vitel";
+    const providerLabel =
+      (r as any).vitelGlobal?.provider === "vonage"
+        ? "vonage"
+        : (r as any).vitelGlobal?.provider
+          ? "vitel"
+          : "vitel";
     const text =
       `${r.employeeName} ${r.systemId} ${r.emails.map((e) => e.email).join(" ")} ${r.vitelGlobal?.id || ""} ${providerLabel}`.toLowerCase();
     const matchQuery = !query || text.includes(query.toLowerCase());
@@ -486,7 +491,9 @@ export default function ITDashboard() {
                       </TableCell>
                       <TableCell>
                         {r.vitelGlobal?.id
-                          ? ((r as any).vitelGlobal?.provider === "vonage" ? "Vonage" : "Vitel Global")
+                          ? (r as any).vitelGlobal?.provider === "vonage"
+                            ? "Vonage"
+                            : "Vitel Global"
                           : "-"}
                       </TableCell>
                       <TableCell>{r.vitelGlobal?.id || "-"}</TableCell>
@@ -504,72 +511,140 @@ export default function ITDashboard() {
                           </SheetTrigger>
                           <SheetContent className="bg-slate-900 border-slate-700 text-white w-full sm:max-w-2xl">
                             <SheetHeader>
-                              <SheetTitle className="text-white">IT Account Preview</SheetTitle>
+                              <SheetTitle className="text-white">
+                                IT Account Preview
+                              </SheetTitle>
                             </SheetHeader>
                             <div className="mt-4 space-y-4 text-sm text-slate-300">
-                              {(() => { const emp = (employees as any[]).find((e:any)=> e.id === r.employeeId) || null; const initials = (r.employeeName || "?").split(" ").map((x)=>x[0]).slice(0,2).join(""); return (
-                                <div className="flex items-center gap-4">
-                                  <Avatar className="h-14 w-14">
-                                    <AvatarImage src={(emp && emp.photo) || "/placeholder.svg"} alt={r.employeeName} />
-                                    <AvatarFallback>{initials}</AvatarFallback>
-                                  </Avatar>
-                                  <div>
-                                    <div className="text-lg font-semibold text-white">{r.employeeName}</div>
-                                    <div className="text-slate-400 text-xs">Emp ID: {emp?.employeeId || r.employeeId}</div>
+                              {(() => {
+                                const emp =
+                                  (employees as any[]).find(
+                                    (e: any) => e.id === r.employeeId,
+                                  ) || null;
+                                const initials = (r.employeeName || "?")
+                                  .split(" ")
+                                  .map((x) => x[0])
+                                  .slice(0, 2)
+                                  .join("");
+                                return (
+                                  <div className="flex items-center gap-4">
+                                    <Avatar className="h-14 w-14">
+                                      <AvatarImage
+                                        src={
+                                          (emp && emp.photo) ||
+                                          "/placeholder.svg"
+                                        }
+                                        alt={r.employeeName}
+                                      />
+                                      <AvatarFallback>
+                                        {initials}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                      <div className="text-lg font-semibold text-white">
+                                        {r.employeeName}
+                                      </div>
+                                      <div className="text-slate-400 text-xs">
+                                        Emp ID:{" "}
+                                        {emp?.employeeId || r.employeeId}
+                                      </div>
+                                    </div>
                                   </div>
-                                </div>
-                              ); })()}
+                                );
+                              })()}
 
                               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                                 <div>
-                                  <div className="text-slate-400">Department</div>
-                                  <div className="text-white/90">{r.department}</div>
+                                  <div className="text-slate-400">
+                                    Department
+                                  </div>
+                                  <div className="text-white/90">
+                                    {r.department}
+                                  </div>
                                 </div>
                                 <div>
-                                  <div className="text-slate-400">System ID</div>
-                                  <div className="text-white/90">{r.systemId}</div>
+                                  <div className="text-slate-400">
+                                    System ID
+                                  </div>
+                                  <div className="text-white/90">
+                                    {r.systemId}
+                                  </div>
                                 </div>
                                 <div>
                                   <div className="text-slate-400">Table</div>
-                                  <div className="text-white/90">{r.tableNumber}</div>
+                                  <div className="text-white/90">
+                                    {r.tableNumber}
+                                  </div>
                                 </div>
                                 <div>
                                   <div className="text-slate-400">Provider</div>
-                                  <div className="text-white/90">{r.vitelGlobal?.id ? ((r as any).vitelGlobal?.provider === "vonage" ? "Vonage" : "Vitel Global") : "-"}</div>
+                                  <div className="text-white/90">
+                                    {r.vitelGlobal?.id
+                                      ? (r as any).vitelGlobal?.provider ===
+                                        "vonage"
+                                        ? "Vonage"
+                                        : "Vitel Global"
+                                      : "-"}
+                                  </div>
                                 </div>
                                 <div>
-                                  <div className="text-slate-400">Provider ID</div>
-                                  <div className="text-white/90">{r.vitelGlobal?.id || "-"}</div>
+                                  <div className="text-slate-400">
+                                    Provider ID
+                                  </div>
+                                  <div className="text-white/90">
+                                    {r.vitelGlobal?.id || "-"}
+                                  </div>
                                 </div>
                                 <div>
-                                  <div className="text-slate-400">LM Player</div>
-                                  <div className="text-white/90">{r.lmPlayer?.id || "-"}</div>
+                                  <div className="text-slate-400">
+                                    LM Player
+                                  </div>
+                                  <div className="text-white/90">
+                                    {r.lmPlayer?.id || "-"}
+                                  </div>
                                 </div>
                                 <div>
                                   <div className="text-slate-400">License</div>
-                                  <div className="text-white/90">{r.lmPlayer?.license || "-"}</div>
+                                  <div className="text-white/90">
+                                    {r.lmPlayer?.license || "-"}
+                                  </div>
                                 </div>
                               </div>
 
                               <div>
-                                <div className="text-slate-400 mb-1">Emails</div>
+                                <div className="text-slate-400 mb-1">
+                                  Emails
+                                </div>
                                 <div className="rounded border border-slate-700 bg-slate-800/30 p-2 text-xs">
-                                  {(r.emails || []).length ? (r.emails || []).map((e) => e.email).join(", ") : "-"}
+                                  {(r.emails || []).length
+                                    ? (r.emails || [])
+                                        .map((e) => e.email)
+                                        .join(", ")
+                                    : "-"}
                                 </div>
                               </div>
                               {r.notes && (
                                 <div>
-                                  <div className="text-slate-400 mb-1">Notes</div>
-                                  <div className="rounded border border-slate-700 bg-slate-800/30 p-2 text-xs whitespace-pre-wrap">{r.notes}</div>
+                                  <div className="text-slate-400 mb-1">
+                                    Notes
+                                  </div>
+                                  <div className="rounded border border-slate-700 bg-slate-800/30 p-2 text-xs whitespace-pre-wrap">
+                                    {r.notes}
+                                  </div>
                                 </div>
                               )}
-                              <div className="text-xs text-slate-500">Created: {new Date(r.createdAt).toLocaleString()}</div>
+                              <div className="text-xs text-slate-500">
+                                Created:{" "}
+                                {new Date(r.createdAt).toLocaleString()}
+                              </div>
 
                               <div className="flex justify-end gap-2 pt-2">
                                 <Button
                                   className="bg-blue-500 hover:bg-blue-600 text-white"
                                   onClick={() => {
-                                    const params = new URLSearchParams({ itId: r.id });
+                                    const params = new URLSearchParams({
+                                      itId: r.id,
+                                    });
                                     window.location.href = `/it?${params.toString()}`;
                                   }}
                                 >

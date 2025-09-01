@@ -38,7 +38,12 @@ interface Department {
   name: string;
 }
 
-type EmailCred = { provider: string; providerCustom?: string; email: string; password: string };
+type EmailCred = {
+  provider: string;
+  providerCustom?: string;
+  email: string;
+  password: string;
+};
 
 interface ITRecord {
   id: string;
@@ -93,14 +98,33 @@ export default function ITPage() {
         setTableNumber(rec.tableNumber);
         setSystemId(rec.systemId);
         setPreSelectedSystemId(rec.systemId);
-        setEmails(rec.emails && rec.emails.length ? rec.emails : [{ provider: "CUSTOM", providerCustom: "", email: "", password: "" }]);
+        setEmails(
+          rec.emails && rec.emails.length
+            ? rec.emails
+            : [
+                {
+                  provider: "CUSTOM",
+                  providerCustom: "",
+                  email: "",
+                  password: "",
+                },
+              ],
+        );
         setProvider((rec.vitelGlobal?.provider as any) || "vitel");
         setVitel({ id: rec.vitelGlobal?.id || "" });
         setPreSelectedProviderId(rec.vitelGlobal?.id || "");
-        setLm({ id: rec.lmPlayer?.id || "", password: rec.lmPlayer?.password || "", license: rec.lmPlayer?.license || "standard" });
+        setLm({
+          id: rec.lmPlayer?.id || "",
+          password: rec.lmPlayer?.password || "",
+          license: rec.lmPlayer?.license || "standard",
+        });
         setNotes(rec.notes || "");
         setIsPreFilled(true);
-        window.history.replaceState({}, document.title, window.location.pathname);
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname,
+        );
         return;
       }
     }
@@ -128,7 +152,10 @@ export default function ITPage() {
       }
     }
 
-    if (preSystemId) { setSystemId(preSystemId); setPreSelectedSystemId(preSystemId); }
+    if (preSystemId) {
+      setSystemId(preSystemId);
+      setPreSelectedSystemId(preSystemId);
+    }
 
     if (preProvider === "vonage" || preProvider === "vitel") {
       setProvider(preProvider as any);
@@ -136,17 +163,31 @@ export default function ITPage() {
       const raw = localStorage.getItem(STORAGE_KEY);
       const assets = raw ? (JSON.parse(raw) as any[]) : [];
       const isVonage = assets.some(
-        (a) => a.category === "vonage" && (a.vonageExtCode === preProviderId || a.vonageNumber === preProviderId || a.id === preProviderId),
+        (a) =>
+          a.category === "vonage" &&
+          (a.vonageExtCode === preProviderId ||
+            a.vonageNumber === preProviderId ||
+            a.id === preProviderId),
       );
       setProvider(isVonage ? ("vonage" as any) : ("vitel" as any));
     }
 
-    if (preProviderId) { setVitel({ id: preProviderId }); setPreSelectedProviderId(preProviderId); }
+    if (preProviderId) {
+      setVitel({ id: preProviderId });
+      setPreSelectedProviderId(preProviderId);
+    }
 
     if (preLmId) setLm((s) => ({ ...s, id: preLmId }));
     if (preLmPassword) setLm((s) => ({ ...s, password: preLmPassword }));
 
-    if (preEmployeeId || preSystemId || preProvider || preProviderId || preLmId || preLmPassword) {
+    if (
+      preEmployeeId ||
+      preSystemId ||
+      preProvider ||
+      preProviderId ||
+      preLmId ||
+      preLmPassword
+    ) {
       setIsPreFilled(true);
       window.history.replaceState({}, document.title, window.location.pathname);
     }
@@ -170,13 +211,16 @@ export default function ITPage() {
       let available = pcLaptopIds.filter(
         (id: string) => !assignedIds.includes(id),
       );
-      if (preSelectedSystemId && !available.includes(preSelectedSystemId) && pcLaptopIds.includes(preSelectedSystemId)) {
+      if (
+        preSelectedSystemId &&
+        !available.includes(preSelectedSystemId) &&
+        pcLaptopIds.includes(preSelectedSystemId)
+      ) {
         available = [preSelectedSystemId, ...available];
       }
       setAvailableSystemIds(available);
     }
   };
-
 
   const saveRecords = (next: ITRecord[]) => {
     setRecords(next);
@@ -208,7 +252,8 @@ export default function ITPage() {
   const [providerIds, setProviderIds] = useState<string[]>([]);
   const [pcPreview, setPcPreview] = useState<any | null>(null);
   const [providerPreview, setProviderPreview] = useState<any | null>(null);
-  const [preSelectedProviderId, setPreSelectedProviderId] = useState<string>("");
+  const [preSelectedProviderId, setPreSelectedProviderId] =
+    useState<string>("");
   const [isPreFilled, setIsPreFilled] = useState(false);
 
   useEffect(() => {
@@ -223,9 +268,14 @@ export default function ITPage() {
     const raw = localStorage.getItem(STORAGE_KEY);
     const assets = raw ? (JSON.parse(raw) as any[]) : [];
     let ids = assets
-      .filter((a) => (provider === "vonage" ? a.category === "vonage" : a.category === "vitel" || a.category === "vitel-global"))
+      .filter((a) =>
+        provider === "vonage"
+          ? a.category === "vonage"
+          : a.category === "vitel" || a.category === "vitel-global",
+      )
       .map((a) => {
-        if (provider === "vonage") return a.vonageExtCode || a.vonageNumber || a.id;
+        if (provider === "vonage")
+          return a.vonageExtCode || a.vonageNumber || a.id;
         return a.id;
       })
       .filter((x) => typeof x === "string" && x.trim());
@@ -233,7 +283,9 @@ export default function ITPage() {
       ids = [preSelectedProviderId, ...ids];
     }
     setProviderIds(ids);
-    setVitel((s) => ({ id: ids.includes(s.id) ? s.id : preSelectedProviderId || "" }));
+    setVitel((s) => ({
+      id: ids.includes(s.id) ? s.id : preSelectedProviderId || "",
+    }));
   }, [provider, preSelectedProviderId]);
 
   // Ensure the pre-selected System ID is present in options after URL parsing
@@ -265,12 +317,16 @@ export default function ITPage() {
       const match = assets.find(
         (a) =>
           a.category === "vonage" &&
-          (a.vonageExtCode === vitel.id || a.vonageNumber === vitel.id || a.id === vitel.id),
+          (a.vonageExtCode === vitel.id ||
+            a.vonageNumber === vitel.id ||
+            a.id === vitel.id),
       );
       setProviderPreview(match || null);
     } else {
       const match = assets.find(
-        (a) => (a.category === "vitel" || a.category === "vitel-global") && a.id === vitel.id,
+        (a) =>
+          (a.category === "vitel" || a.category === "vitel-global") &&
+          a.id === vitel.id,
       );
       setProviderPreview(match || null);
     }
@@ -291,16 +347,25 @@ export default function ITPage() {
 
   const filteredTables = useMemo(() => {
     const keep = String(employee?.tableNumber || "");
-    return availableTables.filter((n) => (keep && n === keep) || !usedTables.has(n));
+    return availableTables.filter(
+      (n) => (keep && n === keep) || !usedTables.has(n),
+    );
   }, [availableTables, usedTables, employee]);
 
   const hasAssignedTable = useMemo(
-    () => !!((employee?.tableNumber && String(employee.tableNumber).trim()) || (tableNumber && String(tableNumber).trim())),
+    () =>
+      !!(
+        (employee?.tableNumber && String(employee.tableNumber).trim()) ||
+        (tableNumber && String(tableNumber).trim())
+      ),
     [employee, tableNumber],
   );
 
   const addEmailRow = () =>
-    setEmails((rows) => [...rows, { provider: "CUSTOM", providerCustom: "", email: "", password: "" }]);
+    setEmails((rows) => [
+      ...rows,
+      { provider: "CUSTOM", providerCustom: "", email: "", password: "" },
+    ]);
 
   const requirePasscode = () => {
     const code = prompt("Enter passcode to view passwords");
@@ -351,7 +416,9 @@ export default function ITPage() {
 
     // reset minimal
     setSystemId("");
-    setEmails([{ provider: "CUSTOM", providerCustom: "", email: "", password: "" }]);
+    setEmails([
+      { provider: "CUSTOM", providerCustom: "", email: "", password: "" },
+    ]);
     setProvider("vitel");
     setVitel({ id: "" });
     setLm({ id: "", password: "", license: "standard" });
@@ -483,7 +550,9 @@ export default function ITPage() {
                 </Select>
                 {pcPreview && (
                   <div className="mt-2 p-3 rounded border border-slate-700 bg-slate-800/30 text-slate-300 text-sm">
-                    <div className="font-medium text-white mb-1">PC/Laptop Preview: {pcPreview.id}</div>
+                    <div className="font-medium text-white mb-1">
+                      PC/Laptop Preview: {pcPreview.id}
+                    </div>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                       <div>Mouse: {pcPreview.mouseId || "-"}</div>
                       <div>Keyboard: {pcPreview.keyboardId || "-"}</div>
@@ -549,7 +618,11 @@ export default function ITPage() {
                       variant="outline"
                       size="sm"
                       className="border-slate-600 text-slate-300"
-                      onClick={() => (secretsVisible ? setSecretsVisible(false) : requirePasscode())}
+                      onClick={() =>
+                        secretsVisible
+                          ? setSecretsVisible(false)
+                          : requirePasscode()
+                      }
                     >
                       {secretsVisible ? "Hide Passwords" : "Show Passwords"}
                     </Button>
@@ -574,7 +647,11 @@ export default function ITPage() {
                         <Select
                           value={row.provider}
                           onValueChange={(v) =>
-                            setEmails((r) => r.map((x, i) => (i === idx ? { ...x, provider: v } : x)))
+                            setEmails((r) =>
+                              r.map((x, i) =>
+                                i === idx ? { ...x, provider: v } : x,
+                              ),
+                            )
                           }
                         >
                           <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
@@ -602,7 +679,11 @@ export default function ITPage() {
                             value={row.providerCustom || ""}
                             onChange={(e) => {
                               const v = e.target.value;
-                              setEmails((r) => r.map((x, i) => (i === idx ? { ...x, providerCustom: v } : x)));
+                              setEmails((r) =>
+                                r.map((x, i) =>
+                                  i === idx ? { ...x, providerCustom: v } : x,
+                                ),
+                              );
                             }}
                             className="bg-slate-800/50 border-slate-700 text-white"
                           />
@@ -614,7 +695,9 @@ export default function ITPage() {
                         onChange={(e) => {
                           const v = e.target.value;
                           setEmails((r) =>
-                            r.map((x, i) => (i === idx ? { ...x, email: v } : x)),
+                            r.map((x, i) =>
+                              i === idx ? { ...x, email: v } : x,
+                            ),
                           );
                         }}
                         className="bg-slate-800/50 border-slate-700 text-white"
@@ -653,7 +736,10 @@ export default function ITPage() {
               <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label className="text-slate-300">Provider</Label>
-                  <Select value={provider} onValueChange={(v) => setProvider(v as any)}>
+                  <Select
+                    value={provider}
+                    onValueChange={(v) => setProvider(v as any)}
+                  >
                     <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
                       <SelectValue />
                     </SelectTrigger>
@@ -664,29 +750,60 @@ export default function ITPage() {
                   </Select>
                 </div>
                 <div className="space-y-2 md:col-span-2">
-                  <Label className="text-slate-300">{provider === "vonage" ? "Vonage ID" : "Vitel Global ID"}</Label>
-                  <Select value={vitel.id} onValueChange={(v) => setVitel({ id: v })}>
+                  <Label className="text-slate-300">
+                    {provider === "vonage" ? "Vonage ID" : "Vitel Global ID"}
+                  </Label>
+                  <Select
+                    value={vitel.id}
+                    onValueChange={(v) => setVitel({ id: v })}
+                  >
                     <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
-                      <SelectValue placeholder={providerIds.length ? "Select ID" : "No IDs found in System Info"} />
+                      <SelectValue
+                        placeholder={
+                          providerIds.length
+                            ? "Select ID"
+                            : "No IDs found in System Info"
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
                       {providerIds.length === 0 ? (
-                        <div className="px-3 py-2 text-slate-400">Add {provider === "vonage" ? "Vonage" : "Vitel Global"} IDs in System Info</div>
+                        <div className="px-3 py-2 text-slate-400">
+                          Add{" "}
+                          {provider === "vonage" ? "Vonage" : "Vitel Global"}{" "}
+                          IDs in System Info
+                        </div>
                       ) : (
                         providerIds.map((id) => (
-                          <SelectItem key={id} value={id}>{id}</SelectItem>
+                          <SelectItem key={id} value={id}>
+                            {id}
+                          </SelectItem>
                         ))
                       )}
                     </SelectContent>
                   </Select>
                   {providerPreview && (
                     <div className="mt-2 p-3 rounded border border-slate-700 bg-slate-800/30 text-slate-300 text-sm">
-                      <div className="font-medium text-white mb-1">{provider === "vonage" ? "Vonage" : "Vitel Global"} Preview</div>
+                      <div className="font-medium text-white mb-1">
+                        {provider === "vonage" ? "Vonage" : "Vitel Global"}{" "}
+                        Preview
+                      </div>
                       {provider === "vonage" ? (
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                          <div>Ext: {providerPreview?.vonageExtCode || "-"}</div>
-                          <div>Number: {providerPreview?.vonageNumber || "-"}</div>
-                          <div>Password: {providerPreview?.vonagePassword ? (secretsVisible ? providerPreview.vonagePassword : "••••••") : "-"}</div>
+                          <div>
+                            Ext: {providerPreview?.vonageExtCode || "-"}
+                          </div>
+                          <div>
+                            Number: {providerPreview?.vonageNumber || "-"}
+                          </div>
+                          <div>
+                            Password:{" "}
+                            {providerPreview?.vonagePassword
+                              ? secretsVisible
+                                ? providerPreview.vonagePassword
+                                : "••••••"
+                              : "-"}
+                          </div>
                           <div>ID: {providerPreview?.id || "-"}</div>
                         </div>
                       ) : (
@@ -703,7 +820,9 @@ export default function ITPage() {
                   <Label className="text-slate-300">LM Player ID</Label>
                   <Input
                     value={lm.id}
-                    onChange={(e) => setLm((s) => ({ ...s, id: e.target.value }))}
+                    onChange={(e) =>
+                      setLm((s) => ({ ...s, id: e.target.value }))
+                    }
                     className="bg-slate-800/50 border-slate-700 text-white"
                   />
                 </div>
@@ -712,7 +831,9 @@ export default function ITPage() {
                   <Input
                     type={secretsVisible ? "text" : "password"}
                     value={lm.password}
-                    onChange={(e) => setLm((s) => ({ ...s, password: e.target.value }))}
+                    onChange={(e) =>
+                      setLm((s) => ({ ...s, password: e.target.value }))
+                    }
                     className="bg-slate-800/50 border-slate-700 text-white"
                   />
                 </div>
@@ -776,7 +897,7 @@ export default function ITPage() {
                         </TableCell>
                         <TableCell>
                           {r.vitelGlobal?.id
-                            ? `${((r as any).vitelGlobal?.provider === "vonage" ? "Vonage" : ((r as any).vitelGlobal?.provider ? "Vitel Global" : (r as any).vitelGlobal?.type || "Vitel Global"))}: ${r.vitelGlobal.id}`
+                            ? `${(r as any).vitelGlobal?.provider === "vonage" ? "Vonage" : (r as any).vitelGlobal?.provider ? "Vitel Global" : (r as any).vitelGlobal?.type || "Vitel Global"}: ${r.vitelGlobal.id}`
                             : "-"}
                         </TableCell>
                         <TableCell>{r.lmPlayer.id || "-"}</TableCell>
