@@ -1,6 +1,7 @@
 import AppNav from "@/components/Navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { STORAGE_KEY } from "@/lib/systemAssets";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -152,6 +153,7 @@ export default function ITPage() {
   const [lm, setLm] = useState({ id: "", password: "", license: "standard" });
   const [notes, setNotes] = useState("");
   const [availableSystemIds, setAvailableSystemIds] = useState<string[]>([]);
+  const [providerIds, setProviderIds] = useState<string[]>([]);
   const [isPreFilled, setIsPreFilled] = useState(false);
 
   useEffect(() => {
@@ -160,6 +162,22 @@ export default function ITPage() {
       setTableNumber(employee.tableNumber || tableNumber);
     }
   }, [employee]);
+
+  // Load provider IDs from System Info assets
+  useEffect(() => {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const assets = raw ? JSON.parse(raw) as any[] : [];
+    const ids = assets
+      .filter((a) => (provider === "vonage" ? a.category === "vonage" : a.category === "vitel" || a.category === "vitel-global"))
+      .map((a) => {
+        if (provider === "vonage") return a.vonageExtCode || a.vonageNumber || a.id;
+        return a.id;
+      })
+      .filter((x) => typeof x === "string" && x.trim());
+    setProviderIds(ids);
+    // Clear selected id if it no longer exists
+    setVitel((s) => ({ id: ids.includes(s.id) ? s.id : "" }));
+  }, [provider]);
 
   const availableTables = useMemo(
     () => Array.from({ length: 32 }, (_, i) => String(i + 1)),
@@ -468,11 +486,20 @@ export default function ITPage() {
                 </div>
                 <div className="space-y-2 md:col-span-2">
                   <Label className="text-slate-300">{provider === "vonage" ? "Vonage ID" : "Vitel Global ID"}</Label>
-                  <Input
-                    value={vitel.id}
-                    onChange={(e) => setVitel((s) => ({ ...s, id: e.target.value }))}
-                    className="bg-slate-800/50 border-slate-700 text-white"
-                  />
+                  <Select value={vitel.id} onValueChange={(v) => setVitel({ id: v })}>
+                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                      <SelectValue placeholder={providerIds.length ? "Select ID" : "No IDs found in System Info"} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                      {providerIds.length === 0 ? (
+                        <div className="px-3 py-2 text-slate-400">Add {provider === "vonage" ? "Vonage" : "Vitel Global"} IDs in System Info</div>
+                      ) : (
+                        providerIds.map((id) => (
+                          <SelectItem key={id} value={id}>{id}</SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
