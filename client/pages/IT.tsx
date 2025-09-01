@@ -203,6 +203,7 @@ export default function ITPage() {
   const [vitel, setVitel] = useState({ id: "" });
   const [lm, setLm] = useState({ id: "", password: "", license: "standard" });
   const [notes, setNotes] = useState("");
+  const [secretsVisible, setSecretsVisible] = useState(false);
   const [availableSystemIds, setAvailableSystemIds] = useState<string[]>([]);
   const [providerIds, setProviderIds] = useState<string[]>([]);
   const [pcPreview, setPcPreview] = useState<any | null>(null);
@@ -300,6 +301,15 @@ export default function ITPage() {
 
   const addEmailRow = () =>
     setEmails((rows) => [...rows, { provider: "CUSTOM", providerCustom: "", email: "", password: "" }]);
+
+  const requirePasscode = () => {
+    const code = prompt("Enter passcode to view passwords");
+    if (code === "1111") {
+      setSecretsVisible(true);
+    } else if (code !== null) {
+      alert("Incorrect passcode");
+    }
+  };
   const removeEmailRow = (idx: number) =>
     setEmails((rows) => rows.filter((_, i) => i !== idx));
 
@@ -533,15 +543,26 @@ export default function ITPage() {
               <div className="md:col-span-3 space-y-2">
                 <div className="flex items-center justify-between">
                   <Label className="text-slate-300">Emails and Passwords</Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="border-slate-600 text-slate-300"
-                    onClick={addEmailRow}
-                  >
-                    <Plus className="h-4 w-4 mr-2" /> Add Email
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="border-slate-600 text-slate-300"
+                      onClick={() => (secretsVisible ? setSecretsVisible(false) : requirePasscode())}
+                    >
+                      {secretsVisible ? "Hide Passwords" : "Show Passwords"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="border-slate-600 text-slate-300"
+                      onClick={addEmailRow}
+                    >
+                      <Plus className="h-4 w-4 mr-2" /> Add Email
+                    </Button>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   {emails.map((row, idx) => (
@@ -610,7 +631,7 @@ export default function ITPage() {
                           );
                         }}
                         className="bg-slate-800/50 border-slate-700 text-white"
-                        type="password"
+                        type={secretsVisible ? "text" : "password"}
                       />
                       <div className="flex justify-end">
                         <Button
@@ -665,7 +686,7 @@ export default function ITPage() {
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                           <div>Ext: {providerPreview?.vonageExtCode || "-"}</div>
                           <div>Number: {providerPreview?.vonageNumber || "-"}</div>
-                          <div>Password: {providerPreview?.vonagePassword || "-"}</div>
+                          <div>Password: {providerPreview?.vonagePassword ? (secretsVisible ? providerPreview.vonagePassword : "••••••") : "-"}</div>
                           <div>ID: {providerPreview?.id || "-"}</div>
                         </div>
                       ) : (
@@ -689,7 +710,7 @@ export default function ITPage() {
                 <div className="space-y-2">
                   <Label className="text-slate-300">LM Player Password</Label>
                   <Input
-                    type="password"
+                    type={secretsVisible ? "text" : "password"}
                     value={lm.password}
                     onChange={(e) => setLm((s) => ({ ...s, password: e.target.value }))}
                     className="bg-slate-800/50 border-slate-700 text-white"
