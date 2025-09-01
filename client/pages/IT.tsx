@@ -475,7 +475,7 @@ export default function ITPage() {
                   {emails.map((row, idx) => (
                     <div
                       key={idx}
-                      className="grid grid-cols-1 md:grid-cols-3 gap-2 items-center"
+                      className="grid grid-cols-1 md:grid-cols-4 gap-2 items-center"
                     >
                       <Input
                         placeholder="email@example.com"
