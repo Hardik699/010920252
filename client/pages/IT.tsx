@@ -543,7 +543,7 @@ export default function ITPage() {
                       <TableHead>Dept</TableHead>
                       <TableHead>Table</TableHead>
                       <TableHead>Emails</TableHead>
-                      <TableHead>Vitel</TableHead>
+                      <TableHead>Telephony</TableHead>
                       <TableHead>LM Player</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
