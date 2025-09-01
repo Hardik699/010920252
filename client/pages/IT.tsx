@@ -38,7 +38,7 @@ interface Department {
   name: string;
 }
 
-type EmailCred = { provider: string; email: string; password: string };
+type EmailCred = { provider: string; providerCustom?: string; email: string; password: string };
 
 interface ITRecord {
   id: string;
@@ -146,7 +146,7 @@ export default function ITPage() {
   const [tableNumber, setTableNumber] = useState<string>("");
   const [department, setDepartment] = useState<string>("");
   const [emails, setEmails] = useState<EmailCred[]>([
-    { provider: "CUSTOM", email: "", password: "" },
+    { provider: "CUSTOM", providerCustom: "", email: "", password: "" },
   ]);
   const [provider, setProvider] = useState<"vitel" | "vonage">("vitel");
   const [vitel, setVitel] = useState({ id: "" });
@@ -221,7 +221,7 @@ export default function ITPage() {
   );
 
   const addEmailRow = () =>
-    setEmails((rows) => [...rows, { provider: "CUSTOM", email: "", password: "" }]);
+    setEmails((rows) => [...rows, { provider: "CUSTOM", providerCustom: "", email: "", password: "" }]);
   const removeEmailRow = (idx: number) =>
     setEmails((rows) => rows.filter((_, i) => i !== idx));
 
@@ -263,7 +263,7 @@ export default function ITPage() {
 
     // reset minimal
     setSystemId("");
-    setEmails([{ provider: "CUSTOM", email: "", password: "" }]);
+    setEmails([{ provider: "CUSTOM", providerCustom: "", email: "", password: "" }]);
     setProvider("vitel");
     setVitel({ id: "" });
     setLm({ id: "", password: "", license: "standard" });
@@ -477,31 +477,43 @@ export default function ITPage() {
                       key={idx}
                       className="grid grid-cols-1 md:grid-cols-4 gap-2 items-center"
                     >
-                      <Select
-                        value={row.provider}
-                        onValueChange={(v) =>
-                          setEmails((r) => r.map((x, i) => (i === idx ? { ...x, provider: v } : x)))
-                        }
-                      >
-                        <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
-                          <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
-                          {[
-                            "WX",
-                            "NSIT",
-                            "LP",
-                            "MS TEMS",
-                            "OURVIN",
-                            "MOSTER",
-                            "CUSTOM",
-                          ].map((opt) => (
-                            <SelectItem key={opt} value={opt}>
-                              {opt}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      {row.provider === "CUSTOM" ? (
+                        <Input
+                          placeholder="Custom provider"
+                          value={row.providerCustom || ""}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            setEmails((r) => r.map((x, i) => (i === idx ? { ...x, providerCustom: v } : x)));
+                          }}
+                          className="bg-slate-800/50 border-slate-700 text-white"
+                        />
+                      ) : (
+                        <Select
+                          value={row.provider}
+                          onValueChange={(v) =>
+                            setEmails((r) => r.map((x, i) => (i === idx ? { ...x, provider: v } : x)))
+                          }
+                        >
+                          <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                            <SelectValue placeholder="Select" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                            {[
+                              "WX",
+                              "NSIT",
+                              "LP",
+                              "MS TEMS",
+                              "OURVIN",
+                              "MOSTER",
+                              "CUSTOM",
+                            ].map((opt) => (
+                              <SelectItem key={opt} value={opt}>
+                                {opt}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
                       <Input
                         placeholder="email@example.com"
                         value={row.email}
