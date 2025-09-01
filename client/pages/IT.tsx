@@ -433,15 +433,9 @@ export default function ITPage() {
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label className="text-slate-300">Table Number</Label>
-                {isPreFilled ? (
-                  <Input
-                    value={tableNumber}
-                    disabled
-                    className="bg-slate-800/50 border-slate-700 text-white"
-                  />
-                ) : (
+              {!employee?.tableNumber && (
+                <div className="space-y-2">
+                  <Label className="text-slate-300">Table Number</Label>
                   <Select value={tableNumber} onValueChange={setTableNumber}>
                     <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
                       <SelectValue placeholder="Select table (1-32)" />
@@ -454,8 +448,8 @@ export default function ITPage() {
                       ))}
                     </SelectContent>
                   </Select>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Emails */}
               <div className="md:col-span-3 space-y-2">
