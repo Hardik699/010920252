@@ -81,26 +81,27 @@ export default function ITPage() {
   useEffect(() => {
     // Check for URL parameters to pre-fill form
     const urlParams = new URLSearchParams(window.location.search);
-    const preEmployeeId = urlParams.get("employeeId");
-    const preDepartment = urlParams.get("department");
-    const preTableNumber = urlParams.get("tableNumber");
-    const preSystemId = urlParams.get("systemId");
-    const preProvider = urlParams.get("provider");
-    const preProviderId = urlParams.get("providerId");
-    const preLmId = urlParams.get("lmId");
-    const preLmPassword = urlParams.get("lmPassword");
+    const preEmployeeId = urlParams.get("employeeId") || "";
+    const preDepartment = urlParams.get("department") || "";
+    const preTableNumber = urlParams.get("tableNumber") || "";
+    const preSystemId = urlParams.get("systemId") || "";
+    const preProvider = urlParams.get("provider") || "";
+    const preProviderId = urlParams.get("providerId") || "";
+    const preLmId = urlParams.get("lmId") || "";
+    const preLmPassword = urlParams.get("lmPassword") || "";
 
-    // Prefill employee-related fields when employees are available
+    // Always set basic values from URL first
+    if (preEmployeeId) setEmployeeId(preEmployeeId);
+    if (preDepartment) setDepartment(preDepartment);
+    if (preTableNumber) setTableNumber(preTableNumber);
+
+    // Enhance with employee defaults when available
     if (preEmployeeId && employees.length > 0) {
       const foundEmployee = employees.find((emp) => emp.id === preEmployeeId);
       if (foundEmployee) {
-        setEmployeeId(preEmployeeId);
-        setDepartment(preDepartment || foundEmployee.department);
-        setTableNumber(preTableNumber || foundEmployee.tableNumber);
-      } else {
-        setEmployeeId(preEmployeeId);
-        if (preDepartment) setDepartment(preDepartment);
-        if (preTableNumber) setTableNumber(preTableNumber);
+        if (!preDepartment) setDepartment(foundEmployee.department || "");
+        if (!preTableNumber && foundEmployee.tableNumber)
+          setTableNumber(String(foundEmployee.tableNumber));
       }
     }
 
