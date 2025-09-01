@@ -143,6 +143,7 @@ export default function ITPage() {
     [employees, employeeId],
   );
   const [systemId, setSystemId] = useState("");
+  const [preSelectedSystemId, setPreSelectedSystemId] = useState<string>("");
   const [tableNumber, setTableNumber] = useState<string>("");
   const [department, setDepartment] = useState<string>("");
   const [emails, setEmails] = useState<EmailCred[]>([
