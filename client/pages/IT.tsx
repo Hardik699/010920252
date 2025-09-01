@@ -96,8 +96,20 @@ export default function ITPage() {
           setDepartment(preDepartment || foundEmployee.department);
           setTableNumber(preTableNumber || foundEmployee.tableNumber);
           if (preSystemId) { setSystemId(preSystemId); setPreSelectedSystemId(preSystemId); }
-          if (preProvider === "vonage" || preProvider === "vitel") setProvider(preProvider as any);
-          if (preProviderId) setVitel({ id: preProviderId });
+
+          // Provider inference
+          if (preProvider === "vonage" || preProvider === "vitel") {
+            setProvider(preProvider as any);
+          } else if (preProviderId) {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            const assets = raw ? (JSON.parse(raw) as any[]) : [];
+            const isVonage = assets.some(
+              (a) => a.category === "vonage" && (a.vonageExtCode === preProviderId || a.vonageNumber === preProviderId || a.id === preProviderId),
+            );
+            setProvider(isVonage ? ("vonage" as any) : ("vitel" as any));
+          }
+
+          if (preProviderId) { setVitel({ id: preProviderId }); setPreSelectedProviderId(preProviderId); }
           setIsPreFilled(true);
 
           window.history.replaceState({}, document.title, window.location.pathname);
@@ -160,6 +172,7 @@ export default function ITPage() {
   const [providerIds, setProviderIds] = useState<string[]>([]);
   const [pcPreview, setPcPreview] = useState<any | null>(null);
   const [providerPreview, setProviderPreview] = useState<any | null>(null);
+  const [preSelectedProviderId, setPreSelectedProviderId] = useState<string>("");
   const [isPreFilled, setIsPreFilled] = useState(false);
 
   useEffect(() => {
@@ -173,16 +186,19 @@ export default function ITPage() {
   useEffect(() => {
     const raw = localStorage.getItem(STORAGE_KEY);
     const assets = raw ? (JSON.parse(raw) as any[]) : [];
-    const ids = assets
+    let ids = assets
       .filter((a) => (provider === "vonage" ? a.category === "vonage" : a.category === "vitel" || a.category === "vitel-global"))
       .map((a) => {
         if (provider === "vonage") return a.vonageExtCode || a.vonageNumber || a.id;
         return a.id;
       })
       .filter((x) => typeof x === "string" && x.trim());
+    if (preSelectedProviderId && !ids.includes(preSelectedProviderId)) {
+      ids = [preSelectedProviderId, ...ids];
+    }
     setProviderIds(ids);
-    setVitel((s) => ({ id: ids.includes(s.id) ? s.id : "" }));
-  }, [provider]);
+    setVitel((s) => ({ id: ids.includes(s.id) ? s.id : preSelectedProviderId || "" }));
+  }, [provider, preSelectedProviderId]);
 
   // Auto-load PC/Laptop details when System ID changes
   useEffect(() => {
