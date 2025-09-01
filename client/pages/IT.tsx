@@ -447,22 +447,6 @@ export default function ITPage() {
               {/* Vitel Global */}
               <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-slate-300">Vitel Global Type</Label>
-                  <Select
-                    value={vitel.type}
-                    onValueChange={(v) => setVitel((s) => ({ ...s, type: v }))}
-                  >
-                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-slate-700 text-white">
-                      <SelectItem value="extension">Extension</SelectItem>
-                      <SelectItem value="softphone">Softphone</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
                   <Label className="text-slate-300">
                     Vitel Extension Number
                   </Label>
