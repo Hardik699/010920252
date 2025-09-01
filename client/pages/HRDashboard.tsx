@@ -1175,11 +1175,27 @@ Generated on: ${new Date().toLocaleString()}
 
     const deptCounts = (name: string) =>
       updatedEmployees.filter((e) => e.department === name && e.status === "active").length;
-    const updatedDepartments = savedDepartments.map((d) => ({
-      ...d,
-      employeeCount: deptCounts(d.name),
-    }));
-    saveDepartments(updatedDepartments);
+    if (savedDepartments.length === 0) {
+      const defaultDepartments: Department[] = [
+        { id: "1", name: "Engineering", manager: "John Smith", employeeCount: 0 },
+        { id: "2", name: "Marketing", manager: "Sarah Johnson", employeeCount: 0 },
+        { id: "3", name: "Sales", manager: "Mike Davis", employeeCount: 0 },
+        { id: "4", name: "HR", manager: "Lisa Wilson", employeeCount: 0 },
+        { id: "5", name: "Finance", manager: "David Brown", employeeCount: 0 },
+        { id: "6", name: "Operations", manager: "Emma Wilson", employeeCount: 0 },
+      ];
+      const seededDepartments = defaultDepartments.map((d) => ({
+        ...d,
+        employeeCount: deptCounts(d.name),
+      }));
+      saveDepartments(seededDepartments);
+    } else {
+      const updatedDepartments = savedDepartments.map((d) => ({
+        ...d,
+        employeeCount: deptCounts(d.name),
+      }));
+      saveDepartments(updatedDepartments);
+    }
 
     const pending = JSON.parse(localStorage.getItem("pendingITNotifications") || "[]");
     const newNotifs = newEmployees.map((employee) => ({
