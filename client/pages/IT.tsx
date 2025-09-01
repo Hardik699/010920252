@@ -561,8 +561,8 @@ export default function ITPage() {
                           {r.emails.map((e) => e.email).join(", ")}
                         </TableCell>
                         <TableCell>
-                          {r.vitelGlobal.id
-                            ? `${r.vitelGlobal.type}: ${r.vitelGlobal.id}${r.vitelGlobal.extNumber ? ` (${r.vitelGlobal.extNumber})` : ""}`
+                          {r.vitelGlobal?.id
+                            ? `${((r as any).vitelGlobal?.provider === "vonage" ? "Vonage" : ((r as any).vitelGlobal?.provider ? "Vitel Global" : (r as any).vitelGlobal?.type || "Vitel Global"))}: ${r.vitelGlobal.id}`
                             : "-"}
                         </TableCell>
                         <TableCell>{r.lmPlayer.id || "-"}</TableCell>
