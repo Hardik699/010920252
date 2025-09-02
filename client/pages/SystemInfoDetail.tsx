@@ -86,6 +86,12 @@ const registry: Record<
     color: "text-teal-400",
     bg: "bg-teal-500/20",
   },
+  storage: {
+    title: "SSD/HDD",
+    Icon: HardDrive,
+    color: "text-emerald-400",
+    bg: "bg-emerald-500/20",
+  },
   vonage: {
     title: "Vonage",
     Icon: Phone,
@@ -154,6 +160,8 @@ export default function SystemInfoDetail() {
     ramSize: "",
     ramType: "",
     processorModel: "",
+    storageType: "",
+    storageCapacity: "",
   });
 
   useEffect(() => {
@@ -181,6 +189,8 @@ export default function SystemInfoDetail() {
       ramSize: "",
       ramType: "",
       processorModel: "",
+      storageType: "",
+      storageCapacity: "",
     });
     setShowForm(true);
   };
@@ -226,6 +236,8 @@ export default function SystemInfoDetail() {
       ramSize: categoryKey === "ram" ? (form.ramSize || "").trim() : undefined,
       ramType: categoryKey === "ram" ? (form.ramType || "").trim() : undefined,
       processorModel: categoryKey === "motherboard" ? (form.processorModel || "").trim() : undefined,
+      storageType: categoryKey === "storage" ? (form.storageType || "").trim() : undefined,
+      storageCapacity: categoryKey === "storage" ? (form.storageCapacity || "").trim() : undefined,
     };
     const next = [record, ...assets];
     setAssets(next);
@@ -468,6 +480,37 @@ export default function SystemInfoDetail() {
                       </div>
                     )}
 
+                    {categoryKey === "storage" && (
+                      <>
+                        <div className="space-y-2">
+                          <Label className="text-slate-300">Storage Type</Label>
+                          <Select value={form.storageType} onValueChange={(v) => setForm((s) => ({ ...s, storageType: v }))}>
+                            <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                              <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                              {['SSD','HDD','NVMe'].map((t) => (
+                                <SelectItem key={t} value={t}>{t}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-slate-300">Capacity</Label>
+                          <Select value={form.storageCapacity} onValueChange={(v) => setForm((s) => ({ ...s, storageCapacity: v }))}>
+                            <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                              <SelectValue placeholder="Select capacity" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                              {['128GB','256GB','512GB','1TB','2TB','4TB'].map((c) => (
+                                <SelectItem key={c} value={c}>{c}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </>
+                    )}
+
                     <div className="space-y-2">
                       <Label className="text-slate-300">Vendor Name</Label>
                       <Input
@@ -561,6 +604,8 @@ export default function SystemInfoDetail() {
                         {categoryKey === "ram" && <TableHead>RAM Size</TableHead>}
                         {categoryKey === "ram" && <TableHead>RAM Type</TableHead>}
                         {categoryKey === "motherboard" && <TableHead>Processor</TableHead>}
+                        {categoryKey === "storage" && <TableHead>Type</TableHead>}
+                        {categoryKey === "storage" && <TableHead>Capacity</TableHead>}
                         <TableHead>Vendor</TableHead>
                         <TableHead>Purchase Date</TableHead>
                         <TableHead>Warranty End Date</TableHead>
@@ -587,6 +632,8 @@ export default function SystemInfoDetail() {
                           {categoryKey === "ram" && <TableCell>{(a as any).ramSize || "-"}</TableCell>}
                           {categoryKey === "ram" && <TableCell>{(a as any).ramType || "-"}</TableCell>}
                           {categoryKey === "motherboard" && <TableCell>{(a as any).processorModel || "-"}</TableCell>}
+                          {categoryKey === "storage" && <TableCell>{(a as any).storageType || "-"}</TableCell>}
+                          {categoryKey === "storage" && <TableCell>{(a as any).storageCapacity || "-"}</TableCell>}
                           <TableCell>{a.vendorName}</TableCell>
                           <TableCell>{a.purchaseDate}</TableCell>
                           <TableCell>{a.warrantyEndDate}</TableCell>
