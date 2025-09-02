@@ -15,6 +15,8 @@ export type Asset = {
   // RAM-specific optional fields
   ramSize?: string; // e.g., 2GB, 4GB, 8GB, 16GB
   ramType?: string; // e.g., DDR2, DDR3, DDR4, DDR5
+  // Motherboard-specific optional field
+  processorModel?: string; // e.g., i3, i5, i6, i7, i9
 };
 
 export const STORAGE_KEY = "systemAssets";
