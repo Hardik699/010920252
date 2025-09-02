@@ -12,6 +12,9 @@ export type Asset = {
   vonageNumber?: string;
   vonageExtCode?: string;
   vonagePassword?: string;
+  // RAM-specific optional fields
+  ramSize?: string; // e.g., 2GB, 4GB, 8GB, 16GB
+  ramType?: string; // e.g., DDR2, DDR3, DDR4, DDR5
 };
 
 export const STORAGE_KEY = "systemAssets";
