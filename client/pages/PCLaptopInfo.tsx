@@ -61,6 +61,7 @@ export default function PCLaptopInfo() {
   const [cameraAssets, setCameraAssets] = useState<SysAsset[]>([]);
   const [headphoneAssets, setHeadphoneAssets] = useState<SysAsset[]>([]);
   const [powerSupplyAssets, setPowerSupplyAssets] = useState<SysAsset[]>([]);
+  const [storageAssets, setStorageAssets] = useState<SysAsset[]>([]);
   const [ramAssets, setRamAssets] = useState<SysAsset[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState<Asset | null>(null);
