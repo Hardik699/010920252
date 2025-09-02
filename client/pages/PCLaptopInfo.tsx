@@ -568,6 +568,37 @@ export default function PCLaptopInfo() {
                     </SelectContent>
                   </Select>
                 </div>
+                <div className="space-y-2">
+                  <Label className="text-slate-300">RAM (Slot 2)</Label>
+                  <Select
+                    value={form.ramId2}
+                    onValueChange={(v) => setForm((s) => ({ ...s, ramId2: v }))}
+                  >
+                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                      <SelectValue
+                        placeholder={
+                          ramAssets.length ? "Select available RAM" : "No available RAM"
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                      <SelectItem value="none">
+                        <span className="text-slate-400">-- No RAM --</span>
+                      </SelectItem>
+                      {ramAssets.length === 0 ? (
+                        <div className="px-3 py-2 text-slate-400">
+                          No available RAM items
+                        </div>
+                      ) : (
+                        ramAssets.map((m) => (
+                          <SelectItem key={m.id} value={m.id}>
+                            {m.id}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div className="md:col-span-2 flex justify-end gap-2">
                   <Button
                     type="button"
