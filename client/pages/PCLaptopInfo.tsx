@@ -284,6 +284,7 @@ export default function PCLaptopInfo() {
     setCameraAssets(getAvailableAssets(sysList.filter((s) => s.category === "camera"), usedCameraIds));
     setHeadphoneAssets(getAvailableAssets(sysList.filter((s) => s.category === "headphone"), usedHeadphoneIds));
     setPowerSupplyAssets(getAvailableAssets(sysList.filter((s) => s.category === "power-supply"), usedPowerSupplyIds));
+    setStorageAssets(getAvailableAssets(sysList.filter((s) => s.category === "storage"), usedStorageIds));
     setRamAssets(getAvailableAssets(sysList.filter((s) => s.category === "ram"), usedRamIds));
 
     setShowForm(false);
