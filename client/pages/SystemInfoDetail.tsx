@@ -153,6 +153,7 @@ export default function SystemInfoDetail() {
     vonagePassword: "",
     ramSize: "",
     ramType: "",
+    processorModel: "",
   });
 
   useEffect(() => {
@@ -179,6 +180,7 @@ export default function SystemInfoDetail() {
       vonagePassword: "",
       ramSize: "",
       ramType: "",
+      processorModel: "",
     });
     setShowForm(true);
   };
@@ -223,6 +225,7 @@ export default function SystemInfoDetail() {
       vonagePassword: form.vonagePassword,
       ramSize: categoryKey === "ram" ? (form.ramSize || "").trim() : undefined,
       ramType: categoryKey === "ram" ? (form.ramType || "").trim() : undefined,
+      processorModel: categoryKey === "motherboard" ? (form.processorModel || "").trim() : undefined,
     };
     const next = [record, ...assets];
     setAssets(next);
@@ -449,6 +452,22 @@ export default function SystemInfoDetail() {
                       </>
                     )}
 
+                    {categoryKey === "motherboard" && (
+                      <div className="space-y-2">
+                        <Label className="text-slate-300">Processor</Label>
+                        <Select value={form.processorModel} onValueChange={(v) => setForm((s) => ({ ...s, processorModel: v }))}>
+                          <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                            <SelectValue placeholder="Select processor" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                            {['i3','i5','i6','i7','i9'].map((p) => (
+                              <SelectItem key={p} value={p}>{p}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+
                     <div className="space-y-2">
                       <Label className="text-slate-300">Vendor Name</Label>
                       <Input
@@ -541,6 +560,7 @@ export default function SystemInfoDetail() {
                         <TableHead>Serial Number</TableHead>
                         {categoryKey === "ram" && <TableHead>RAM Size</TableHead>}
                         {categoryKey === "ram" && <TableHead>RAM Type</TableHead>}
+                        {categoryKey === "motherboard" && <TableHead>Processor</TableHead>}
                         <TableHead>Vendor</TableHead>
                         <TableHead>Purchase Date</TableHead>
                         <TableHead>Warranty End Date</TableHead>
@@ -566,6 +586,7 @@ export default function SystemInfoDetail() {
                           <TableCell>{a.serialNumber}</TableCell>
                           {categoryKey === "ram" && <TableCell>{(a as any).ramSize || "-"}</TableCell>}
                           {categoryKey === "ram" && <TableCell>{(a as any).ramType || "-"}</TableCell>}
+                          {categoryKey === "motherboard" && <TableCell>{(a as any).processorModel || "-"}</TableCell>}
                           <TableCell>{a.vendorName}</TableCell>
                           <TableCell>{a.purchaseDate}</TableCell>
                           <TableCell>{a.warrantyEndDate}</TableCell>
