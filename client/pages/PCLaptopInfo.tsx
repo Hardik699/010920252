@@ -244,6 +244,7 @@ export default function PCLaptopInfo() {
       cameraId: form.cameraId && form.cameraId !== "none" ? form.cameraId.trim() : undefined,
       headphoneId: form.headphoneId && form.headphoneId !== "none" ? form.headphoneId.trim() : undefined,
       powerSupplyId: form.powerSupplyId && form.powerSupplyId !== "none" ? form.powerSupplyId.trim() : undefined,
+      storageId: (form as any).storageId && (form as any).storageId !== "none" ? (form as any).storageId.trim() : undefined,
       ramId: form.ramId && form.ramId !== "none" ? form.ramId.trim() : undefined,
     };
 
