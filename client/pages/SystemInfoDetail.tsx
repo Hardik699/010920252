@@ -421,21 +421,29 @@ export default function SystemInfoDetail() {
                       <>
                         <div className="space-y-2">
                           <Label className="text-slate-300">RAM Size</Label>
-                          <Input
-                            value={form.ramSize}
-                            onChange={(e) => setForm((s) => ({ ...s, ramSize: e.target.value }))}
-                            className="bg-slate-800/50 border-slate-700 text-white"
-                            placeholder="e.g., 2GB, 4GB, 8GB, 16GB"
-                          />
+                          <Select value={form.ramSize} onValueChange={(v) => setForm((s) => ({ ...s, ramSize: v }))}>
+                            <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                              <SelectValue placeholder="Select size" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                              {['2GB','4GB','8GB','16GB','32GB','64GB'].map((sz) => (
+                                <SelectItem key={sz} value={sz}>{sz}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div className="space-y-2">
                           <Label className="text-slate-300">RAM Type</Label>
-                          <Input
-                            value={form.ramType}
-                            onChange={(e) => setForm((s) => ({ ...s, ramType: e.target.value }))}
-                            className="bg-slate-800/50 border-slate-700 text-white"
-                            placeholder="e.g., DDR2, DDR3, DDR4, DDR5"
-                          />
+                          <Select value={form.ramType} onValueChange={(v) => setForm((s) => ({ ...s, ramType: v }))}>
+                            <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                              <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                              {['DDR2','DDR3','DDR4','DDR5'].map((t) => (
+                                <SelectItem key={t} value={t}>{t}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                       </>
                     )}
