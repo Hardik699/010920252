@@ -106,7 +106,10 @@ export default function PCLaptopInfo() {
     const usedCameraIds = getUsedIds(currentItems, 'cameraId');
     const usedHeadphoneIds = getUsedIds(currentItems, 'headphoneId');
     const usedPowerSupplyIds = getUsedIds(currentItems, 'powerSupplyId');
-    const usedRamIds = getUsedIds(currentItems, 'ramId');
+    const usedRamIds = Array.from(new Set([
+      ...getUsedIds(currentItems, 'ramId'),
+      ...getUsedIds(currentItems as any, 'ramId2' as any),
+    ]));
 
     // Filter out used IDs from available assets
     const allMouseAssets = sysList.filter((s) => s.category === "mouse");
