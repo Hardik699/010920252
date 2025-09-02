@@ -612,6 +612,7 @@ export default function PCLaptopInfo() {
                       <TableHead>Headphone ID</TableHead>
                       <TableHead>Power Supply ID</TableHead>
                       <TableHead>RAM ID</TableHead>
+                      <TableHead>RAM 2 ID</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
