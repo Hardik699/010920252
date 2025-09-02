@@ -207,6 +207,7 @@ export default function PCLaptopInfo() {
         headphoneId: "none",
         powerSupplyId: "none",
         ramId: "none",
+        ramId2: "none",
       });
     }
     setShowForm(true);
