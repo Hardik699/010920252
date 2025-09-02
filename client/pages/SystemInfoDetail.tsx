@@ -226,42 +226,30 @@ export default function SystemInfoDetail() {
       }
     }
 
-    // Multi-create for RAM via Quantity
-    const qty = categoryKey === "ram" ? Math.max(1, parseInt(form.quantity || "1", 10)) : 1;
-    let cursor = [...assets];
-    const created: Asset[] = [];
-    for (let i = 0; i < qty; i++) {
-      const genId = nextWxId(cursor, categoryKey);
-      const autoSerial = form.serialNumber
-        ? `${form.serialNumber}-${i + 1}`
-        : `RAM-${Date.now()}-${i + 1}`;
-      const record: Asset = {
-        id: genId,
-        category: categoryKey,
-        serialNumber: (categoryKey === "ram" ? autoSerial : form.serialNumber).trim(),
-        vendorName: form.vendorName.trim(),
-        companyName: form.companyName.trim(),
-        purchaseDate: form.purchaseDate,
-        warrantyEndDate: form.warrantyEndDate,
-        createdAt: new Date().toISOString(),
-        vonageNumber: form.vonageNumber?.trim(),
-        vonageExtCode: form.vonageExtCode?.trim(),
-        vonagePassword: form.vonagePassword,
-        ramSize: categoryKey === "ram" ? (form.ramSize || "").trim() : undefined,
-        ramType: categoryKey === "ram" ? (form.ramType || "").trim() : undefined,
-        processorModel: categoryKey === "motherboard" ? (form.processorModel || "").trim() : undefined,
-        storageType: categoryKey === "storage" ? (form.storageType || "").trim() : undefined,
-        storageCapacity: categoryKey === "storage" ? (form.storageCapacity || "").trim() : undefined,
-      };
-      created.push(record);
-      cursor = [record, ...cursor];
-    }
+    const record: Asset = {
+      id: form.id || nextWxId(assets, categoryKey),
+      category: categoryKey,
+      serialNumber: (form.serialNumber || "").trim(),
+      vendorName: form.vendorName.trim(),
+      companyName: form.companyName.trim(),
+      purchaseDate: form.purchaseDate,
+      warrantyEndDate: form.warrantyEndDate,
+      createdAt: new Date().toISOString(),
+      vonageNumber: form.vonageNumber?.trim(),
+      vonageExtCode: form.vonageExtCode?.trim(),
+      vonagePassword: form.vonagePassword,
+      ramSize: categoryKey === "ram" ? (form.ramSize || "").trim() : undefined,
+      ramType: categoryKey === "ram" ? (form.ramType || "").trim() : undefined,
+      processorModel: categoryKey === "motherboard" ? (form.processorModel || "").trim() : undefined,
+      storageType: categoryKey === "storage" ? (form.storageType || "").trim() : undefined,
+      storageCapacity: categoryKey === "storage" ? (form.storageCapacity || "").trim() : undefined,
+    };
 
-    const next = [...created, ...assets];
+    const next = [record, ...assets];
     setAssets(next);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     setShowForm(false);
-    alert(qty > 1 ? `Saved ${qty} RAM items` : "Saved");
+    alert("Saved");
   };
 
   return (
