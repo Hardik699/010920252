@@ -169,12 +169,6 @@ export default function SystemInfoDetail() {
     setAssets(raw ? JSON.parse(raw) : []);
   }, []);
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("add") === "1" && !showForm && data) {
-      openForm();
-    }
-  }, [showForm, data, assets]);
 
   const filtered = useMemo(
     () => assets.filter((a) => a.category === categoryKey),
