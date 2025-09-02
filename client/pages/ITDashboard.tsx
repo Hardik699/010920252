@@ -106,6 +106,13 @@ export default function ITDashboard() {
   const [pendingNotifications, setPendingNotifications] = useState<
     PendingITNotification[]
   >([]);
+  const [previewSecrets, setPreviewSecrets] = useState(false);
+  const [previewFull, setPreviewFull] = useState(false);
+  const requirePreviewPasscode = () => {
+    const code = prompt("Enter passcode to show passwords");
+    if (code === "1111") setPreviewSecrets(true);
+    else if (code !== null) alert("Incorrect passcode");
+  };
 
   useEffect(() => {
     const its = localStorage.getItem("itAccounts");
@@ -515,6 +522,24 @@ export default function ITDashboard() {
                                 IT Account Preview
                               </SheetTitle>
                             </SheetHeader>
+                            <div className="mt-3 flex items-center justify-end gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="border-slate-600 text-slate-300"
+                                onClick={() => setPreviewFull((v) => !v)}
+                              >
+                                {previewFull ? "Hide Details" : "View Full Details"}
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="border-slate-600 text-slate-300"
+                                onClick={() => (previewSecrets ? setPreviewSecrets(false) : requirePreviewPasscode())}
+                              >
+                                {previewSecrets ? "Hide Passwords" : "Show Passwords"}
+                              </Button>
+                            </div>
                             <div className="mt-4 space-y-4 text-sm text-slate-300">
                               {(() => {
                                 const emp =
@@ -612,17 +637,104 @@ export default function ITDashboard() {
                               </div>
 
                               <div>
-                                <div className="text-slate-400 mb-1">
-                                  Emails
-                                </div>
-                                <div className="rounded border border-slate-700 bg-slate-800/30 p-2 text-xs">
-                                  {(r.emails || []).length
-                                    ? (r.emails || [])
-                                        .map((e) => e.email)
-                                        .join(", ")
-                                    : "-"}
-                                </div>
+                                <div className="text-slate-400 mb-1">Emails</div>
+                                {(r.emails || []).length ? (
+                                  <div className="rounded border border-slate-700 bg-slate-800/30 divide-y divide-slate-700">
+                                    {(r.emails as any[]).map((e: any, i: number) => (
+                                      <div key={i} className="p-2 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                                        <div>
+                                          <div className="text-slate-500">Provider</div>
+                                          <div>{e.providerCustom || e.provider || "-"}</div>
+                                        </div>
+                                        <div>
+                                          <div className="text-slate-500">Email</div>
+                                          <div>{e.email || "-"}</div>
+                                        </div>
+                                        <div>
+                                          <div className="text-slate-500">Password</div>
+                                          <div>{e.password ? (previewSecrets ? e.password : "••••••") : "-"}</div>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <div className="rounded border border-slate-700 bg-slate-800/30 p-2 text-xs">-</div>
+                                )}
                               </div>
+
+                              {(() => {
+                                if (!previewFull) return null;
+                                const assetsRaw = localStorage.getItem("systemAssets");
+                                const assets = assetsRaw ? JSON.parse(assetsRaw) : [];
+                                let providerAsset: any = null;
+                                if ((r as any).vitelGlobal?.provider === "vonage") {
+                                  providerAsset = assets.find(
+                                    (a: any) =>
+                                      a.category === "vonage" &&
+                                      (a.id === r.vitelGlobal?.id ||
+                                        a.vonageExtCode === r.vitelGlobal?.id ||
+                                        a.vonageNumber === r.vitelGlobal?.id),
+                                  );
+                                } else {
+                                  providerAsset = assets.find(
+                                    (a: any) =>
+                                      (a.category === "vitel" || a.category === "vitel-global") &&
+                                      a.id === r.vitelGlobal?.id,
+                                  );
+                                }
+                                return (
+                                  <div className="rounded border border-slate-700 bg-slate-800/30 p-3">
+                                    <div className="font-medium text-white mb-2">Provider Details</div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                                      <div>Category: {providerAsset?.category || (r as any).vitelGlobal?.provider || "-"}</div>
+                                      <div>ID: {r.vitelGlobal?.id || "-"}</div>
+                                      <div>Vendor: {providerAsset?.vendorName || "-"}</div>
+                                      <div>Company: {providerAsset?.companyName || "-"}</div>
+                                      <div>Ext: {providerAsset?.vonageExtCode || "-"}</div>
+                                      <div>Number: {providerAsset?.vonageNumber || "-"}</div>
+                                      <div>Password: {providerAsset?.vonagePassword ? (previewSecrets ? providerAsset.vonagePassword : "••••••") : "-"}</div>
+                                    </div>
+                                  </div>
+                                );
+                              })()}
+
+                              {(() => {
+                                if (!previewFull) return null;
+                                const pcRaw = localStorage.getItem("pcLaptopAssets");
+                                const pcs = pcRaw ? JSON.parse(pcRaw) : [];
+                                const pc = pcs.find((x: any) => x.id === r.systemId) || {};
+                                const assetsRaw2 = localStorage.getItem("systemAssets");
+                                const assets2 = assetsRaw2 ? JSON.parse(assetsRaw2) : [];
+                                const nameFor = (id: string) => {
+                                  if (!id) return "-";
+                                  const a = assets2.find((t: any) => t.id === id);
+                                  return a ? `${a.companyName || a.vendorName || "-"} (${a.id})` : id;
+                                };
+                                const rows = [
+                                  { label: "Mouse", v: nameFor((pc as any).mouseId) },
+                                  { label: "Keyboard", v: nameFor((pc as any).keyboardId) },
+                                  { label: "Motherboard", v: nameFor((pc as any).motherboardId) },
+                                  { label: "Camera", v: nameFor((pc as any).cameraId) },
+                                  { label: "Headphone", v: nameFor((pc as any).headphoneId) },
+                                  { label: "Power Supply", v: nameFor((pc as any).powerSupplyId) },
+                                  { label: "RAM", v: nameFor((pc as any).ramId) },
+                                  { label: "Monitor", v: nameFor((pc as any).monitorId) },
+                                ];
+                                return (
+                                  <div className="rounded border border-slate-700 bg-slate-800/30 p-3">
+                                    <div className="font-medium text-white mb-2">System Details</div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                                      {rows.map((row) => (
+                                        <div key={row.label}>
+                                          <div className="text-slate-500">{row.label}</div>
+                                          <div>{row.v}</div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                );
+                              })()}
+
                               {r.notes && (
                                 <div>
                                   <div className="text-slate-400 mb-1">
