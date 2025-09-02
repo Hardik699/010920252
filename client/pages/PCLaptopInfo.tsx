@@ -109,6 +109,7 @@ export default function PCLaptopInfo() {
     const usedCameraIds = getUsedIds(currentItems, 'cameraId');
     const usedHeadphoneIds = getUsedIds(currentItems, 'headphoneId');
     const usedPowerSupplyIds = getUsedIds(currentItems, 'powerSupplyId');
+    const usedStorageIds = getUsedIds(currentItems as any, 'storageId' as any);
     const usedRamIds = Array.from(new Set([
       ...getUsedIds(currentItems, 'ramId'),
       ...getUsedIds(currentItems as any, 'ramId2' as any),
@@ -121,6 +122,7 @@ export default function PCLaptopInfo() {
     const allCameraAssets = sysList.filter((s) => s.category === "camera");
     const allHeadphoneAssets = sysList.filter((s) => s.category === "headphone");
     const allPowerSupplyAssets = sysList.filter((s) => s.category === "power-supply");
+    const allStorageAssets = sysList.filter((s) => s.category === "storage");
     const allRamAssets = sysList.filter((s) => s.category === "ram");
 
     setMouseAssets(getAvailableAssets(allMouseAssets, usedMouseIds));
@@ -129,6 +131,7 @@ export default function PCLaptopInfo() {
     setCameraAssets(getAvailableAssets(allCameraAssets, usedCameraIds));
     setHeadphoneAssets(getAvailableAssets(allHeadphoneAssets, usedHeadphoneIds));
     setPowerSupplyAssets(getAvailableAssets(allPowerSupplyAssets, usedPowerSupplyIds));
+    setStorageAssets(getAvailableAssets(allStorageAssets, usedStorageIds));
     setRamAssets(getAvailableAssets(allRamAssets, usedRamIds));
   }, []);
 
