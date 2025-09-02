@@ -1,6 +1,7 @@
 import AppNav from "@/components/Navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { STORAGE_KEY } from "@/lib/systemAssets";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,7 +38,12 @@ interface Department {
   name: string;
 }
 
-type EmailCred = { email: string; password: string };
+type EmailCred = {
+  provider: string;
+  providerCustom?: string;
+  email: string;
+  password: string;
+};
 
 interface ITRecord {
   id: string;
@@ -49,9 +55,7 @@ interface ITRecord {
   emails: EmailCred[];
   vitelGlobal: {
     id: string;
-    password: string;
-    type: string;
-    extNumber?: string;
+    provider: "vitel" | "vonage";
   };
   lmPlayer: { id: string; password: string; license: string };
   notes?: string;
@@ -80,30 +84,112 @@ export default function ITPage() {
 
   // Handle URL parameters after employees are loaded
   useEffect(() => {
-    if (employees.length > 0) {
-      // Check for URL parameters to pre-fill form
-      const urlParams = new URLSearchParams(window.location.search);
-      const preEmployeeId = urlParams.get("employeeId");
-      const preDepartment = urlParams.get("department");
-      const preTableNumber = urlParams.get("tableNumber");
+    const urlParams = new URLSearchParams(window.location.search);
+    const preItId = urlParams.get("itId") || "";
 
-      if (preEmployeeId) {
-        // Verify the employee exists in the loaded data
-        const foundEmployee = employees.find((emp) => emp.id === preEmployeeId);
-        if (foundEmployee) {
-          setEmployeeId(preEmployeeId);
-          setDepartment(preDepartment || foundEmployee.department);
-          setTableNumber(preTableNumber || foundEmployee.tableNumber);
-          setIsPreFilled(true);
-
-          // Clear URL parameters after loading to clean up the URL
-          window.history.replaceState(
-            {},
-            document.title,
-            window.location.pathname,
-          );
-        }
+    // If editing an existing IT record by id, load everything
+    if (preItId) {
+      const itsRaw = localStorage.getItem("itAccounts");
+      const all: ITRecord[] = itsRaw ? JSON.parse(itsRaw) : [];
+      const rec = all.find((x) => x.id === preItId);
+      if (rec) {
+        setEmployeeId(rec.employeeId);
+        setDepartment(rec.department);
+        setTableNumber(rec.tableNumber);
+        setSystemId(rec.systemId);
+        setPreSelectedSystemId(rec.systemId);
+        setEmails(
+          rec.emails && rec.emails.length
+            ? rec.emails
+            : [
+                {
+                  provider: "CUSTOM",
+                  providerCustom: "",
+                  email: "",
+                  password: "",
+                },
+              ],
+        );
+        setProvider((rec.vitelGlobal?.provider as any) || "vitel");
+        setVitel({ id: rec.vitelGlobal?.id || "" });
+        setPreSelectedProviderId(rec.vitelGlobal?.id || "");
+        setLm({
+          id: rec.lmPlayer?.id || "",
+          password: rec.lmPlayer?.password || "",
+          license: rec.lmPlayer?.license || "standard",
+        });
+        setNotes(rec.notes || "");
+        setIsPreFilled(true);
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname,
+        );
+        return;
       }
+    }
+
+    // Otherwise, fall back to param-based prefill (HR notification / partial edit)
+    const preEmployeeId = urlParams.get("employeeId") || "";
+    const preDepartment = urlParams.get("department") || "";
+    const preTableNumber = urlParams.get("tableNumber") || "";
+    const preSystemId = urlParams.get("systemId") || "";
+    const preProvider = urlParams.get("provider") || "";
+    const preProviderId = urlParams.get("providerId") || "";
+    const preLmId = urlParams.get("lmId") || "";
+    const preLmPassword = urlParams.get("lmPassword") || "";
+
+    if (preEmployeeId) setEmployeeId(preEmployeeId);
+    if (preDepartment) setDepartment(preDepartment);
+    if (preTableNumber) setTableNumber(preTableNumber);
+
+    if (preEmployeeId && employees.length > 0) {
+      const foundEmployee = employees.find((emp) => emp.id === preEmployeeId);
+      if (foundEmployee) {
+        if (!preDepartment) setDepartment(foundEmployee.department || "");
+        if (!preTableNumber && foundEmployee.tableNumber)
+          setTableNumber(String(foundEmployee.tableNumber));
+      }
+    }
+
+    if (preSystemId) {
+      setSystemId(preSystemId);
+      setPreSelectedSystemId(preSystemId);
+    }
+
+    if (preProvider === "vonage" || preProvider === "vitel") {
+      setProvider(preProvider as any);
+    } else if (preProviderId) {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const assets = raw ? (JSON.parse(raw) as any[]) : [];
+      const isVonage = assets.some(
+        (a) =>
+          a.category === "vonage" &&
+          (a.vonageExtCode === preProviderId ||
+            a.vonageNumber === preProviderId ||
+            a.id === preProviderId),
+      );
+      setProvider(isVonage ? ("vonage" as any) : ("vitel" as any));
+    }
+
+    if (preProviderId) {
+      setVitel({ id: preProviderId });
+      setPreSelectedProviderId(preProviderId);
+    }
+
+    if (preLmId) setLm((s) => ({ ...s, id: preLmId }));
+    if (preLmPassword) setLm((s) => ({ ...s, password: preLmPassword }));
+
+    if (
+      preEmployeeId ||
+      preSystemId ||
+      preProvider ||
+      preProviderId ||
+      preLmId ||
+      preLmPassword
+    ) {
+      setIsPreFilled(true);
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [employees]);
 
@@ -122,9 +208,16 @@ export default function ITPage() {
         : [];
 
       // Filter out assigned IDs to show only available ones
-      const available = pcLaptopIds.filter(
+      let available = pcLaptopIds.filter(
         (id: string) => !assignedIds.includes(id),
       );
+      if (
+        preSelectedSystemId &&
+        !available.includes(preSelectedSystemId) &&
+        pcLaptopIds.includes(preSelectedSystemId)
+      ) {
+        available = [preSelectedSystemId, ...available];
+      }
       setAvailableSystemIds(available);
     }
   };
@@ -144,36 +237,144 @@ export default function ITPage() {
     [employees, employeeId],
   );
   const [systemId, setSystemId] = useState("");
+  const [preSelectedSystemId, setPreSelectedSystemId] = useState<string>("");
   const [tableNumber, setTableNumber] = useState<string>("");
   const [department, setDepartment] = useState<string>("");
   const [emails, setEmails] = useState<EmailCred[]>([
-    { email: "", password: "" },
+    { provider: "CUSTOM", providerCustom: "", email: "", password: "" },
   ]);
-  const [vitel, setVitel] = useState({
-    id: "",
-    password: "",
-    type: "extension",
-    extNumber: "",
-  });
+  const [provider, setProvider] = useState<"vitel" | "vonage">("vitel");
+  const [vitel, setVitel] = useState({ id: "" });
   const [lm, setLm] = useState({ id: "", password: "", license: "standard" });
   const [notes, setNotes] = useState("");
+  const [secretsVisible, setSecretsVisible] = useState(false);
   const [availableSystemIds, setAvailableSystemIds] = useState<string[]>([]);
+  const [providerIds, setProviderIds] = useState<string[]>([]);
+  const [pcPreview, setPcPreview] = useState<any | null>(null);
+  const [providerPreview, setProviderPreview] = useState<any | null>(null);
+  const [preSelectedProviderId, setPreSelectedProviderId] =
+    useState<string>("");
   const [isPreFilled, setIsPreFilled] = useState(false);
 
   useEffect(() => {
     if (employee) {
-      setDepartment(employee.department || department);
-      setTableNumber(employee.tableNumber || tableNumber);
+      setDepartment(employee.department || "");
+      if (employee.tableNumber) setTableNumber(String(employee.tableNumber));
     }
   }, [employee]);
+
+  // Load provider IDs from System Info assets
+  useEffect(() => {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const assets = raw ? (JSON.parse(raw) as any[]) : [];
+    let ids = assets
+      .filter((a) =>
+        provider === "vonage"
+          ? a.category === "vonage"
+          : a.category === "vitel" || a.category === "vitel-global",
+      )
+      .map((a) => {
+        if (provider === "vonage")
+          return a.vonageExtCode || a.vonageNumber || a.id;
+        return a.id;
+      })
+      .filter((x) => typeof x === "string" && x.trim());
+    if (preSelectedProviderId && !ids.includes(preSelectedProviderId)) {
+      ids = [preSelectedProviderId, ...ids];
+    }
+    setProviderIds(ids);
+    setVitel((s) => ({
+      id: ids.includes(s.id) ? s.id : preSelectedProviderId || "",
+    }));
+  }, [provider, preSelectedProviderId]);
+
+  // Ensure the pre-selected System ID is present in options after URL parsing
+  useEffect(() => {
+    loadAvailableSystemIds();
+  }, [preSelectedSystemId]);
+
+  // Auto-load PC/Laptop details when System ID changes
+  useEffect(() => {
+    if (!systemId) {
+      setPcPreview(null);
+      return;
+    }
+    const raw = localStorage.getItem("pcLaptopAssets");
+    const list = raw ? (JSON.parse(raw) as any[]) : [];
+    const found = list.find((x) => x.id === systemId) || null;
+    setPcPreview(found);
+  }, [systemId]);
+
+  // Auto-load provider details when provider ID changes
+  useEffect(() => {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const assets = raw ? (JSON.parse(raw) as any[]) : [];
+    if (!vitel.id) {
+      setProviderPreview(null);
+      return;
+    }
+    if (provider === "vonage") {
+      const match = assets.find(
+        (a) =>
+          a.category === "vonage" &&
+          (a.vonageExtCode === vitel.id ||
+            a.vonageNumber === vitel.id ||
+            a.id === vitel.id),
+      );
+      setProviderPreview(match || null);
+    } else {
+      const match = assets.find(
+        (a) =>
+          (a.category === "vitel" || a.category === "vitel-global") &&
+          a.id === vitel.id,
+      );
+      setProviderPreview(match || null);
+    }
+  }, [provider, vitel.id]);
 
   const availableTables = useMemo(
     () => Array.from({ length: 32 }, (_, i) => String(i + 1)),
     [],
   );
 
+  const usedTables = useMemo(() => {
+    return new Set(
+      employees
+        .filter((e) => e.status === "active" && e.tableNumber)
+        .map((e) => String(e.tableNumber)),
+    );
+  }, [employees]);
+
+  const filteredTables = useMemo(() => {
+    const keep = String(employee?.tableNumber || "");
+    return availableTables.filter(
+      (n) => (keep && n === keep) || !usedTables.has(n),
+    );
+  }, [availableTables, usedTables, employee]);
+
+  const hasAssignedTable = useMemo(
+    () =>
+      !!(
+        (employee?.tableNumber && String(employee.tableNumber).trim()) ||
+        (tableNumber && String(tableNumber).trim())
+      ),
+    [employee, tableNumber],
+  );
+
   const addEmailRow = () =>
-    setEmails((rows) => [...rows, { email: "", password: "" }]);
+    setEmails((rows) => [
+      ...rows,
+      { provider: "CUSTOM", providerCustom: "", email: "", password: "" },
+    ]);
+
+  const requirePasscode = () => {
+    const code = prompt("Enter passcode to view passwords");
+    if (code === "1111") {
+      setSecretsVisible(true);
+    } else if (code !== null) {
+      alert("Incorrect passcode");
+    }
+  };
   const removeEmailRow = (idx: number) =>
     setEmails((rows) => rows.filter((_, i) => i !== idx));
 
@@ -194,16 +395,32 @@ export default function ITPage() {
       tableNumber,
       department,
       emails: cleanEmails,
-      vitelGlobal: { ...vitel },
+      vitelGlobal: { id: vitel.id.trim(), provider },
       lmPlayer: { ...lm },
       notes: notes.trim() || undefined,
       createdAt: new Date().toISOString(),
     };
     saveRecords([rec, ...records]);
+
+    // Mark related pending IT notification as processed
+    const allNotifications = JSON.parse(
+      localStorage.getItem("pendingITNotifications") || "[]",
+    );
+    const updatedNotifications = allNotifications.map((n: any) =>
+      n.employeeId === employeeId ? { ...n, processed: true } : n,
+    );
+    localStorage.setItem(
+      "pendingITNotifications",
+      JSON.stringify(updatedNotifications),
+    );
+
     // reset minimal
     setSystemId("");
-    setEmails([{ email: "", password: "" }]);
-    setVitel({ id: "", password: "", type: "extension", extNumber: "" });
+    setEmails([
+      { provider: "CUSTOM", providerCustom: "", email: "", password: "" },
+    ]);
+    setProvider("vitel");
+    setVitel({ id: "" });
     setLm({ id: "", password: "", license: "standard" });
     setNotes("");
     alert("Saved");
@@ -259,18 +476,29 @@ export default function ITPage() {
             >
               <div className="space-y-2">
                 <Label className="text-slate-300">Employee Name</Label>
-                <Select value={employeeId} onValueChange={setEmployeeId}>
-                  <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
-                    <SelectValue placeholder="Select employee" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
-                    {employees.map((e) => (
-                      <SelectItem key={e.id} value={e.id}>
-                        {e.fullName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {isPreFilled && employeeId ? (
+                  <>
+                    <Input
+                      value={employee?.fullName || ""}
+                      disabled
+                      className="bg-slate-800/50 border-slate-700 text-white"
+                    />
+                    <input type="hidden" value={employeeId} />
+                  </>
+                ) : (
+                  <Select value={employeeId} onValueChange={setEmployeeId}>
+                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                      <SelectValue placeholder="Select employee" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                      {employees.map((e) => (
+                        <SelectItem key={e.id} value={e.id}>
+                          {e.fullName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -320,60 +548,147 @@ export default function ITPage() {
                     )}
                   </SelectContent>
                 </Select>
+                {pcPreview && (
+                  <div className="mt-2 p-3 rounded border border-slate-700 bg-slate-800/30 text-slate-300 text-sm">
+                    <div className="font-medium text-white mb-1">
+                      PC/Laptop Preview: {pcPreview.id}
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                      <div>Mouse: {pcPreview.mouseId || "-"}</div>
+                      <div>Keyboard: {pcPreview.keyboardId || "-"}</div>
+                      <div>Motherboard: {pcPreview.motherboardId || "-"}</div>
+                      <div>Camera: {pcPreview.cameraId || "-"}</div>
+                      <div>Headphone: {pcPreview.headphoneId || "-"}</div>
+                      <div>Power Supply: {pcPreview.powerSupplyId || "-"}</div>
+                      <div>RAM: {pcPreview.ramId || "-"}</div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
                 <Label className="text-slate-300">Department</Label>
-                <Select value={department} onValueChange={setDepartment}>
-                  <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
-                    <SelectValue placeholder="Select department" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
-                    {departments.map((d) => (
-                      <SelectItem key={d.id} value={d.name}>
-                        {d.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {isPreFilled ? (
+                  <Input
+                    value={department}
+                    disabled
+                    className="bg-slate-800/50 border-slate-700 text-white"
+                  />
+                ) : (
+                  <Select value={department} onValueChange={setDepartment}>
+                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                      <SelectValue placeholder="Select department" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                      {departments.map((d) => (
+                        <SelectItem key={d.id} value={d.name}>
+                          {d.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
 
-              <div className="space-y-2">
-                <Label className="text-slate-300">Table Number</Label>
-                <Select value={tableNumber} onValueChange={setTableNumber}>
-                  <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
-                    <SelectValue placeholder="Select table (1-32)" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
-                    {availableTables.map((n) => (
-                      <SelectItem key={n} value={n}>
-                        {n}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {!hasAssignedTable && (
+                <div className="space-y-2">
+                  <Label className="text-slate-300">Table Number</Label>
+                  <Select value={tableNumber} onValueChange={setTableNumber}>
+                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                      <SelectValue placeholder="Select table (1-32)" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                      {filteredTables.map((n) => (
+                        <SelectItem key={n} value={n}>
+                          {n}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               {/* Emails */}
               <div className="md:col-span-3 space-y-2">
                 <div className="flex items-center justify-between">
                   <Label className="text-slate-300">Emails and Passwords</Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="border-slate-600 text-slate-300"
-                    onClick={addEmailRow}
-                  >
-                    <Plus className="h-4 w-4 mr-2" /> Add Email
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="border-slate-600 text-slate-300"
+                      onClick={() =>
+                        secretsVisible
+                          ? setSecretsVisible(false)
+                          : requirePasscode()
+                      }
+                    >
+                      {secretsVisible ? "Hide Passwords" : "Show Passwords"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="border-slate-600 text-slate-300"
+                      onClick={addEmailRow}
+                    >
+                      <Plus className="h-4 w-4 mr-2" /> Add Email
+                    </Button>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   {emails.map((row, idx) => (
                     <div
                       key={idx}
-                      className="grid grid-cols-1 md:grid-cols-3 gap-2 items-center"
+                      className="grid grid-cols-1 md:grid-cols-4 gap-2 items-center"
                     >
+                      <div className="space-y-2">
+                        <Select
+                          value={row.provider}
+                          onValueChange={(v) =>
+                            setEmails((r) =>
+                              r.map((x, i) =>
+                                i === idx ? { ...x, provider: v } : x,
+                              ),
+                            )
+                          }
+                        >
+                          <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                            <SelectValue placeholder="Select" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                            {[
+                              "WX",
+                              "NSIT",
+                              "LP",
+                              "MS TEMS",
+                              "OURVIN",
+                              "MOSTER",
+                              "CUSTOM",
+                            ].map((opt) => (
+                              <SelectItem key={opt} value={opt}>
+                                {opt}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {row.provider === "CUSTOM" && (
+                          <Input
+                            placeholder="Custom provider"
+                            value={row.providerCustom || ""}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              setEmails((r) =>
+                                r.map((x, i) =>
+                                  i === idx ? { ...x, providerCustom: v } : x,
+                                ),
+                              );
+                            }}
+                            className="bg-slate-800/50 border-slate-700 text-white"
+                          />
+                        )}
+                      </div>
                       <Input
                         placeholder="email@example.com"
                         value={row.email}
@@ -399,7 +714,7 @@ export default function ITPage() {
                           );
                         }}
                         className="bg-slate-800/50 border-slate-700 text-white"
-                        type="password"
+                        type={secretsVisible ? "text" : "password"}
                       />
                       <div className="flex justify-end">
                         <Button
@@ -417,80 +732,90 @@ export default function ITPage() {
                 </div>
               </div>
 
-              {/* Vitel Global */}
+              {/* Telephony Provider */}
               <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-slate-300">Vitel Global Type</Label>
+                  <Label className="text-slate-300">Provider</Label>
                   <Select
-                    value={vitel.type}
-                    onValueChange={(v) => setVitel((s) => ({ ...s, type: v }))}
+                    value={provider}
+                    onValueChange={(v) => setProvider(v as any)}
                   >
                     <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-slate-800 border-slate-700 text-white">
-                      <SelectItem value="extension">Extension</SelectItem>
-                      <SelectItem value="softphone">Softphone</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="vitel">Vitel Global</SelectItem>
+                      <SelectItem value="vonage">Vonage</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 md:col-span-2">
                   <Label className="text-slate-300">
-                    Vitel Extension Number
+                    {provider === "vonage" ? "Vonage ID" : "Vitel Global ID"}
                   </Label>
-                  <Input
-                    value={vitel.extNumber}
-                    onChange={(e) =>
-                      setVitel((s) => ({ ...s, extNumber: e.target.value }))
-                    }
-                    className="bg-slate-800/50 border-slate-700 text-white"
-                    placeholder="e.g. 101"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-slate-300">Vitel Global ID</Label>
-                  <Input
+                  <Select
                     value={vitel.id}
-                    onChange={(e) =>
-                      setVitel((s) => ({ ...s, id: e.target.value }))
-                    }
-                    className="bg-slate-800/50 border-slate-700 text-white"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-slate-300">
-                    Vitel Global Password
-                  </Label>
-                  <Input
-                    type="password"
-                    value={vitel.password}
-                    onChange={(e) =>
-                      setVitel((s) => ({ ...s, password: e.target.value }))
-                    }
-                    className="bg-slate-800/50 border-slate-700 text-white"
-                  />
+                    onValueChange={(v) => setVitel({ id: v })}
+                  >
+                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                      <SelectValue
+                        placeholder={
+                          providerIds.length
+                            ? "Select ID"
+                            : "No IDs found in System Info"
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                      {providerIds.length === 0 ? (
+                        <div className="px-3 py-2 text-slate-400">
+                          Add{" "}
+                          {provider === "vonage" ? "Vonage" : "Vitel Global"}{" "}
+                          IDs in System Info
+                        </div>
+                      ) : (
+                        providerIds.map((id) => (
+                          <SelectItem key={id} value={id}>
+                            {id}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                  {providerPreview && (
+                    <div className="mt-2 p-3 rounded border border-slate-700 bg-slate-800/30 text-slate-300 text-sm">
+                      <div className="font-medium text-white mb-1">
+                        {provider === "vonage" ? "Vonage" : "Vitel Global"}{" "}
+                        Preview
+                      </div>
+                      {provider === "vonage" ? (
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                          <div>
+                            Ext: {providerPreview?.vonageExtCode || "-"}
+                          </div>
+                          <div>
+                            Number: {providerPreview?.vonageNumber || "-"}
+                          </div>
+                          <div>
+                            Password:{" "}
+                            {providerPreview?.vonagePassword
+                              ? secretsVisible
+                                ? providerPreview.vonagePassword
+                                : "••••••"
+                              : "-"}
+                          </div>
+                          <div>ID: {providerPreview?.id || "-"}</div>
+                        </div>
+                      ) : (
+                        <div>ID: {providerPreview?.id || "-"}</div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* LM Player */}
-              <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-slate-300">LM Player License</Label>
-                  <Select
-                    value={lm.license}
-                    onValueChange={(v) => setLm((s) => ({ ...s, license: v }))}
-                  >
-                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-slate-700 text-white">
-                      <SelectItem value="standard">Standard</SelectItem>
-                      <SelectItem value="pro">Pro</SelectItem>
-                      <SelectItem value="enterprise">Enterprise</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-slate-300">LM Player ID</Label>
                   <Input
@@ -504,7 +829,7 @@ export default function ITPage() {
                 <div className="space-y-2">
                   <Label className="text-slate-300">LM Player Password</Label>
                   <Input
-                    type="password"
+                    type={secretsVisible ? "text" : "password"}
                     value={lm.password}
                     onChange={(e) =>
                       setLm((s) => ({ ...s, password: e.target.value }))
@@ -553,7 +878,7 @@ export default function ITPage() {
                       <TableHead>Dept</TableHead>
                       <TableHead>Table</TableHead>
                       <TableHead>Emails</TableHead>
-                      <TableHead>Vitel</TableHead>
+                      <TableHead>Telephony</TableHead>
                       <TableHead>LM Player</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
@@ -571,8 +896,8 @@ export default function ITPage() {
                           {r.emails.map((e) => e.email).join(", ")}
                         </TableCell>
                         <TableCell>
-                          {r.vitelGlobal.id
-                            ? `${r.vitelGlobal.type}: ${r.vitelGlobal.id}${r.vitelGlobal.extNumber ? ` (${r.vitelGlobal.extNumber})` : ""}`
+                          {r.vitelGlobal?.id
+                            ? `${(r as any).vitelGlobal?.provider === "vonage" ? "Vonage" : (r as any).vitelGlobal?.provider ? "Vitel Global" : (r as any).vitelGlobal?.type || "Vitel Global"}: ${r.vitelGlobal.id}`
                             : "-"}
                         </TableCell>
                         <TableCell>{r.lmPlayer.id || "-"}</TableCell>

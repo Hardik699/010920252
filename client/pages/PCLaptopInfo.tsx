@@ -61,6 +61,7 @@ export default function PCLaptopInfo() {
   const [cameraAssets, setCameraAssets] = useState<SysAsset[]>([]);
   const [headphoneAssets, setHeadphoneAssets] = useState<SysAsset[]>([]);
   const [powerSupplyAssets, setPowerSupplyAssets] = useState<SysAsset[]>([]);
+  const [storageAssets, setStorageAssets] = useState<SysAsset[]>([]);
   const [ramAssets, setRamAssets] = useState<SysAsset[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState<Asset | null>(null);
@@ -72,19 +73,24 @@ export default function PCLaptopInfo() {
     cameraId: "",
     headphoneId: "",
     powerSupplyId: "",
+    storageId: "",
     ramId: "",
+    ramId2: "",
   });
 
   // Helper function to get used IDs for a specific component type
   const getUsedIds = (items: Asset[], field: keyof Asset): string[] => {
     return items
-      .map(item => item[field])
+      .map((item) => item[field])
       .filter((id): id is string => !!id && id !== "none");
   };
 
   // Helper function to filter available assets (not used)
-  const getAvailableAssets = (allAssets: SysAsset[], usedIds: string[]): SysAsset[] => {
-    return allAssets.filter(asset => !usedIds.includes(asset.id));
+  const getAvailableAssets = (
+    allAssets: SysAsset[],
+    usedIds: string[],
+  ): SysAsset[] => {
+    return allAssets.filter((asset) => !usedIds.includes(asset.id));
   };
 
   useEffect(() => {
@@ -100,29 +106,49 @@ export default function PCLaptopInfo() {
     const sysList: SysAsset[] = sysRaw ? JSON.parse(sysRaw) : [];
 
     // Get all used IDs for each component type
-    const usedMouseIds = getUsedIds(currentItems, 'mouseId');
-    const usedKeyboardIds = getUsedIds(currentItems, 'keyboardId');
-    const usedMotherboardIds = getUsedIds(currentItems, 'motherboardId');
-    const usedCameraIds = getUsedIds(currentItems, 'cameraId');
-    const usedHeadphoneIds = getUsedIds(currentItems, 'headphoneId');
-    const usedPowerSupplyIds = getUsedIds(currentItems, 'powerSupplyId');
-    const usedRamIds = getUsedIds(currentItems, 'ramId');
+    const usedMouseIds = getUsedIds(currentItems, "mouseId");
+    const usedKeyboardIds = getUsedIds(currentItems, "keyboardId");
+    const usedMotherboardIds = getUsedIds(currentItems, "motherboardId");
+    const usedCameraIds = getUsedIds(currentItems, "cameraId");
+    const usedHeadphoneIds = getUsedIds(currentItems, "headphoneId");
+    const usedPowerSupplyIds = getUsedIds(currentItems, "powerSupplyId");
+    const usedStorageIds = getUsedIds(currentItems as any, "storageId" as any);
+    const usedRamIds = Array.from(
+      new Set([
+        ...getUsedIds(currentItems, "ramId"),
+        ...getUsedIds(currentItems as any, "ramId2" as any),
+      ]),
+    );
 
     // Filter out used IDs from available assets
     const allMouseAssets = sysList.filter((s) => s.category === "mouse");
     const allKeyboardAssets = sysList.filter((s) => s.category === "keyboard");
-    const allMotherboardAssets = sysList.filter((s) => s.category === "motherboard");
+    const allMotherboardAssets = sysList.filter(
+      (s) => s.category === "motherboard",
+    );
     const allCameraAssets = sysList.filter((s) => s.category === "camera");
-    const allHeadphoneAssets = sysList.filter((s) => s.category === "headphone");
-    const allPowerSupplyAssets = sysList.filter((s) => s.category === "power-supply");
+    const allHeadphoneAssets = sysList.filter(
+      (s) => s.category === "headphone",
+    );
+    const allPowerSupplyAssets = sysList.filter(
+      (s) => s.category === "power-supply",
+    );
+    const allStorageAssets = sysList.filter((s) => s.category === "storage");
     const allRamAssets = sysList.filter((s) => s.category === "ram");
 
     setMouseAssets(getAvailableAssets(allMouseAssets, usedMouseIds));
     setKeyboardAssets(getAvailableAssets(allKeyboardAssets, usedKeyboardIds));
-    setMotherboardAssets(getAvailableAssets(allMotherboardAssets, usedMotherboardIds));
+    setMotherboardAssets(
+      getAvailableAssets(allMotherboardAssets, usedMotherboardIds),
+    );
     setCameraAssets(getAvailableAssets(allCameraAssets, usedCameraIds));
-    setHeadphoneAssets(getAvailableAssets(allHeadphoneAssets, usedHeadphoneIds));
-    setPowerSupplyAssets(getAvailableAssets(allPowerSupplyAssets, usedPowerSupplyIds));
+    setHeadphoneAssets(
+      getAvailableAssets(allHeadphoneAssets, usedHeadphoneIds),
+    );
+    setPowerSupplyAssets(
+      getAvailableAssets(allPowerSupplyAssets, usedPowerSupplyIds),
+    );
+    setStorageAssets(getAvailableAssets(allStorageAssets, usedStorageIds));
     setRamAssets(getAvailableAssets(allRamAssets, usedRamIds));
   }, []);
 
@@ -151,25 +177,56 @@ export default function PCLaptopInfo() {
     // Get all used IDs for each component type
     // When editing, exclude the current item's IDs from "used" so they appear as available
     const itemsToCheck = itemToEdit
-      ? currentItems.filter(item => item.id !== itemToEdit.id)
+      ? currentItems.filter((item) => item.id !== itemToEdit.id)
       : currentItems;
 
-    const usedMouseIds = getUsedIds(itemsToCheck, 'mouseId');
-    const usedKeyboardIds = getUsedIds(itemsToCheck, 'keyboardId');
-    const usedMotherboardIds = getUsedIds(itemsToCheck, 'motherboardId');
-    const usedCameraIds = getUsedIds(itemsToCheck, 'cameraId');
-    const usedHeadphoneIds = getUsedIds(itemsToCheck, 'headphoneId');
-    const usedPowerSupplyIds = getUsedIds(itemsToCheck, 'powerSupplyId');
-    const usedRamIds = getUsedIds(itemsToCheck, 'ramId');
+    const usedMouseIds = getUsedIds(itemsToCheck, "mouseId");
+    const usedKeyboardIds = getUsedIds(itemsToCheck, "keyboardId");
+    const usedMotherboardIds = getUsedIds(itemsToCheck, "motherboardId");
+    const usedCameraIds = getUsedIds(itemsToCheck, "cameraId");
+    const usedHeadphoneIds = getUsedIds(itemsToCheck, "headphoneId");
+    const usedPowerSupplyIds = getUsedIds(itemsToCheck, "powerSupplyId");
+    const usedStorageIds = getUsedIds(itemsToCheck as any, "storageId" as any);
+    const usedRamIds = Array.from(
+      new Set([
+        ...getUsedIds(itemsToCheck, "ramId"),
+        ...getUsedIds(itemsToCheck as any, "ramId2" as any),
+      ]),
+    );
 
     // Get fresh available assets
-    const freshMouseAssets = getAvailableAssets(sysList.filter((s) => s.category === "mouse"), usedMouseIds);
-    const freshKeyboardAssets = getAvailableAssets(sysList.filter((s) => s.category === "keyboard"), usedKeyboardIds);
-    const freshMotherboardAssets = getAvailableAssets(sysList.filter((s) => s.category === "motherboard"), usedMotherboardIds);
-    const freshCameraAssets = getAvailableAssets(sysList.filter((s) => s.category === "camera"), usedCameraIds);
-    const freshHeadphoneAssets = getAvailableAssets(sysList.filter((s) => s.category === "headphone"), usedHeadphoneIds);
-    const freshPowerSupplyAssets = getAvailableAssets(sysList.filter((s) => s.category === "power-supply"), usedPowerSupplyIds);
-    const freshRamAssets = getAvailableAssets(sysList.filter((s) => s.category === "ram"), usedRamIds);
+    const freshMouseAssets = getAvailableAssets(
+      sysList.filter((s) => s.category === "mouse"),
+      usedMouseIds,
+    );
+    const freshKeyboardAssets = getAvailableAssets(
+      sysList.filter((s) => s.category === "keyboard"),
+      usedKeyboardIds,
+    );
+    const freshMotherboardAssets = getAvailableAssets(
+      sysList.filter((s) => s.category === "motherboard"),
+      usedMotherboardIds,
+    );
+    const freshCameraAssets = getAvailableAssets(
+      sysList.filter((s) => s.category === "camera"),
+      usedCameraIds,
+    );
+    const freshHeadphoneAssets = getAvailableAssets(
+      sysList.filter((s) => s.category === "headphone"),
+      usedHeadphoneIds,
+    );
+    const freshPowerSupplyAssets = getAvailableAssets(
+      sysList.filter((s) => s.category === "power-supply"),
+      usedPowerSupplyIds,
+    );
+    const freshStorageAssets = getAvailableAssets(
+      sysList.filter((s) => s.category === "storage"),
+      usedStorageIds,
+    );
+    const freshRamAssets = getAvailableAssets(
+      sysList.filter((s) => s.category === "ram"),
+      usedRamIds,
+    );
 
     // Update state with fresh data
     setMouseAssets(freshMouseAssets);
@@ -178,6 +235,7 @@ export default function PCLaptopInfo() {
     setCameraAssets(freshCameraAssets);
     setHeadphoneAssets(freshHeadphoneAssets);
     setPowerSupplyAssets(freshPowerSupplyAssets);
+    setStorageAssets(freshStorageAssets);
     setRamAssets(freshRamAssets);
 
     if (itemToEdit) {
@@ -191,7 +249,9 @@ export default function PCLaptopInfo() {
         cameraId: itemToEdit.cameraId || "none",
         headphoneId: itemToEdit.headphoneId || "none",
         powerSupplyId: itemToEdit.powerSupplyId || "none",
+        storageId: (itemToEdit as any).storageId || "none",
         ramId: itemToEdit.ramId || "none",
+        ramId2: itemToEdit.ramId2 || "none",
       });
     } else {
       // Add mode - generate new ID and set defaults
@@ -205,13 +265,20 @@ export default function PCLaptopInfo() {
         cameraId: "none",
         headphoneId: "none",
         powerSupplyId: "none",
+        storageId: "none",
         ramId: "none",
+        ramId2: "none",
       });
     }
     setShowForm(true);
 
     // Debug log to verify mode
-    console.log("Form opened in mode:", itemToEdit ? "EDIT" : "ADD", "Item:", itemToEdit?.id || "none");
+    console.log(
+      "Form opened in mode:",
+      itemToEdit ? "EDIT" : "ADD",
+      "Item:",
+      itemToEdit?.id || "none",
+    );
   };
 
   const save = (e: React.FormEvent) => {
@@ -219,19 +286,42 @@ export default function PCLaptopInfo() {
     const record: Asset = {
       id: form.id || nextWxId(items),
       createdAt: editingItem ? editingItem.createdAt : new Date().toISOString(),
-      mouseId: form.mouseId && form.mouseId !== "none" ? form.mouseId.trim() : undefined,
-      keyboardId: form.keyboardId && form.keyboardId !== "none" ? form.keyboardId.trim() : undefined,
-      motherboardId: form.motherboardId && form.motherboardId !== "none" ? form.motherboardId.trim() : undefined,
-      cameraId: form.cameraId && form.cameraId !== "none" ? form.cameraId.trim() : undefined,
-      headphoneId: form.headphoneId && form.headphoneId !== "none" ? form.headphoneId.trim() : undefined,
-      powerSupplyId: form.powerSupplyId && form.powerSupplyId !== "none" ? form.powerSupplyId.trim() : undefined,
-      ramId: form.ramId && form.ramId !== "none" ? form.ramId.trim() : undefined,
+      mouseId:
+        form.mouseId && form.mouseId !== "none"
+          ? form.mouseId.trim()
+          : undefined,
+      keyboardId:
+        form.keyboardId && form.keyboardId !== "none"
+          ? form.keyboardId.trim()
+          : undefined,
+      motherboardId:
+        form.motherboardId && form.motherboardId !== "none"
+          ? form.motherboardId.trim()
+          : undefined,
+      cameraId:
+        form.cameraId && form.cameraId !== "none"
+          ? form.cameraId.trim()
+          : undefined,
+      headphoneId:
+        form.headphoneId && form.headphoneId !== "none"
+          ? form.headphoneId.trim()
+          : undefined,
+      powerSupplyId:
+        form.powerSupplyId && form.powerSupplyId !== "none"
+          ? form.powerSupplyId.trim()
+          : undefined,
+      storageId:
+        (form as any).storageId && (form as any).storageId !== "none"
+          ? (form as any).storageId.trim()
+          : undefined,
+      ramId:
+        form.ramId && form.ramId !== "none" ? form.ramId.trim() : undefined,
     };
 
     let next: Asset[];
     if (editingItem) {
       // Update existing item
-      next = items.map(item => item.id === editingItem.id ? record : item);
+      next = items.map((item) => (item.id === editingItem.id ? record : item));
     } else {
       // Add new item
       next = [record, ...items];
@@ -245,22 +335,69 @@ export default function PCLaptopInfo() {
     const sysList: SysAsset[] = sysRaw ? JSON.parse(sysRaw) : [];
 
     // Get all used IDs including the one we just saved
-    const usedMouseIds = getUsedIds(next, 'mouseId');
-    const usedKeyboardIds = getUsedIds(next, 'keyboardId');
-    const usedMotherboardIds = getUsedIds(next, 'motherboardId');
-    const usedCameraIds = getUsedIds(next, 'cameraId');
-    const usedHeadphoneIds = getUsedIds(next, 'headphoneId');
-    const usedPowerSupplyIds = getUsedIds(next, 'powerSupplyId');
-    const usedRamIds = getUsedIds(next, 'ramId');
+    const usedMouseIds = getUsedIds(next, "mouseId");
+    const usedKeyboardIds = getUsedIds(next, "keyboardId");
+    const usedMotherboardIds = getUsedIds(next, "motherboardId");
+    const usedCameraIds = getUsedIds(next, "cameraId");
+    const usedHeadphoneIds = getUsedIds(next, "headphoneId");
+    const usedPowerSupplyIds = getUsedIds(next, "powerSupplyId");
+    const usedStorageIds = getUsedIds(next as any, "storageId" as any);
+    const usedRamIds = Array.from(
+      new Set([
+        ...getUsedIds(next, "ramId"),
+        ...getUsedIds(next as any, "ramId2" as any),
+      ]),
+    );
 
     // Update available assets
-    setMouseAssets(getAvailableAssets(sysList.filter((s) => s.category === "mouse"), usedMouseIds));
-    setKeyboardAssets(getAvailableAssets(sysList.filter((s) => s.category === "keyboard"), usedKeyboardIds));
-    setMotherboardAssets(getAvailableAssets(sysList.filter((s) => s.category === "motherboard"), usedMotherboardIds));
-    setCameraAssets(getAvailableAssets(sysList.filter((s) => s.category === "camera"), usedCameraIds));
-    setHeadphoneAssets(getAvailableAssets(sysList.filter((s) => s.category === "headphone"), usedHeadphoneIds));
-    setPowerSupplyAssets(getAvailableAssets(sysList.filter((s) => s.category === "power-supply"), usedPowerSupplyIds));
-    setRamAssets(getAvailableAssets(sysList.filter((s) => s.category === "ram"), usedRamIds));
+    setMouseAssets(
+      getAvailableAssets(
+        sysList.filter((s) => s.category === "mouse"),
+        usedMouseIds,
+      ),
+    );
+    setKeyboardAssets(
+      getAvailableAssets(
+        sysList.filter((s) => s.category === "keyboard"),
+        usedKeyboardIds,
+      ),
+    );
+    setMotherboardAssets(
+      getAvailableAssets(
+        sysList.filter((s) => s.category === "motherboard"),
+        usedMotherboardIds,
+      ),
+    );
+    setCameraAssets(
+      getAvailableAssets(
+        sysList.filter((s) => s.category === "camera"),
+        usedCameraIds,
+      ),
+    );
+    setHeadphoneAssets(
+      getAvailableAssets(
+        sysList.filter((s) => s.category === "headphone"),
+        usedHeadphoneIds,
+      ),
+    );
+    setPowerSupplyAssets(
+      getAvailableAssets(
+        sysList.filter((s) => s.category === "power-supply"),
+        usedPowerSupplyIds,
+      ),
+    );
+    setStorageAssets(
+      getAvailableAssets(
+        sysList.filter((s) => s.category === "storage"),
+        usedStorageIds,
+      ),
+    );
+    setRamAssets(
+      getAvailableAssets(
+        sysList.filter((s) => s.category === "ram"),
+        usedRamIds,
+      ),
+    );
 
     setShowForm(false);
     setEditingItem(null);
@@ -274,7 +411,9 @@ export default function PCLaptopInfo() {
       cameraId: "none",
       headphoneId: "none",
       powerSupplyId: "none",
+      storageId: "none",
       ramId: "none",
+      ramId2: "none",
     });
 
     alert(editingItem ? "Updated successfully!" : "Saved successfully!");
@@ -309,10 +448,13 @@ export default function PCLaptopInfo() {
           <Card className="bg-slate-900/50 border-slate-700 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="text-white">
-                {editingItem ? `Edit PC/Laptop - ${editingItem.id}` : "Add PC/Laptop"}
+                {editingItem
+                  ? `Edit PC/Laptop - ${editingItem.id}`
+                  : "Add PC/Laptop"}
               </CardTitle>
               <p className="text-slate-400 text-sm">
-                Only available (unused) component IDs are shown. Already assigned IDs are automatically filtered out.
+                Only available (unused) component IDs are shown. Already
+                assigned IDs are automatically filtered out.
               </p>
             </CardHeader>
             <CardContent>
@@ -339,7 +481,9 @@ export default function PCLaptopInfo() {
                     <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
                       <SelectValue
                         placeholder={
-                          mouseAssets.length ? "Select available mouse" : "No available mouse"
+                          mouseAssets.length
+                            ? "Select available mouse"
+                            : "No available mouse"
                         }
                       />
                     </SelectTrigger>
@@ -380,7 +524,9 @@ export default function PCLaptopInfo() {
                     </SelectTrigger>
                     <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
                       <SelectItem value="none">
-                        <span className="text-slate-400">-- No Keyboard --</span>
+                        <span className="text-slate-400">
+                          -- No Keyboard --
+                        </span>
                       </SelectItem>
                       {keyboardAssets.length === 0 ? (
                         <div className="px-3 py-2 text-slate-400">
@@ -415,7 +561,9 @@ export default function PCLaptopInfo() {
                     </SelectTrigger>
                     <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
                       <SelectItem value="none">
-                        <span className="text-slate-400">-- No Motherboard --</span>
+                        <span className="text-slate-400">
+                          -- No Motherboard --
+                        </span>
                       </SelectItem>
                       {motherboardAssets.length === 0 ? (
                         <div className="px-3 py-2 text-slate-400">
@@ -485,7 +633,9 @@ export default function PCLaptopInfo() {
                     </SelectTrigger>
                     <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
                       <SelectItem value="none">
-                        <span className="text-slate-400">-- No Headphone --</span>
+                        <span className="text-slate-400">
+                          -- No Headphone --
+                        </span>
                       </SelectItem>
                       {headphoneAssets.length === 0 ? (
                         <div className="px-3 py-2 text-slate-400">
@@ -520,7 +670,9 @@ export default function PCLaptopInfo() {
                     </SelectTrigger>
                     <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
                       <SelectItem value="none">
-                        <span className="text-slate-400">-- No Power Supply --</span>
+                        <span className="text-slate-400">
+                          -- No Power Supply --
+                        </span>
                       </SelectItem>
                       {powerSupplyAssets.length === 0 ? (
                         <div className="px-3 py-2 text-slate-400">
@@ -545,7 +697,42 @@ export default function PCLaptopInfo() {
                     <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
                       <SelectValue
                         placeholder={
-                          ramAssets.length ? "Select available RAM" : "No available RAM"
+                          ramAssets.length
+                            ? "Select available RAM"
+                            : "No available RAM"
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                      <SelectItem value="none">
+                        <span className="text-slate-400">-- No RAM --</span>
+                      </SelectItem>
+                      {ramAssets.length === 0 ? (
+                        <div className="px-3 py-2 text-slate-400">
+                          No available RAM items
+                        </div>
+                      ) : (
+                        ramAssets.map((m) => (
+                          <SelectItem key={m.id} value={m.id}>
+                            {m.id}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-slate-300">RAM (Slot 2)</Label>
+                  <Select
+                    value={form.ramId2}
+                    onValueChange={(v) => setForm((s) => ({ ...s, ramId2: v }))}
+                  >
+                    <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                      <SelectValue
+                        placeholder={
+                          ramAssets.length
+                            ? "Select available RAM"
+                            : "No available RAM"
                         }
                       />
                     </SelectTrigger>
@@ -611,6 +798,7 @@ export default function PCLaptopInfo() {
                       <TableHead>Headphone ID</TableHead>
                       <TableHead>Power Supply ID</TableHead>
                       <TableHead>RAM ID</TableHead>
+                      <TableHead>RAM 2 ID</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -625,6 +813,7 @@ export default function PCLaptopInfo() {
                         <TableCell>{a.headphoneId || "-"}</TableCell>
                         <TableCell>{a.powerSupplyId || "-"}</TableCell>
                         <TableCell>{a.ramId || "-"}</TableCell>
+                        <TableCell>{a.ramId2 || "-"}</TableCell>
                         <TableCell>
                           <Button
                             onClick={() => openForm(a)}

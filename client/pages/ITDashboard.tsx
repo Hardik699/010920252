@@ -11,7 +11,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetFooter,
+} from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Select,
   SelectContent,
@@ -42,6 +51,8 @@ import {
   Activity,
   Bell,
   Settings,
+  Eye,
+  Pencil,
 } from "lucide-react";
 
 interface ITRecord {
@@ -53,10 +64,11 @@ interface ITRecord {
   department: string;
   emails: { email: string; password: string }[];
   vitelGlobal: {
-    id: string;
-    password: string;
-    type: string;
+    id?: string;
+    provider?: "vitel" | "vonage";
+    type?: string;
     extNumber?: string;
+    password?: string;
   };
   lmPlayer: { id: string; password: string; license: string };
   notes?: string;
@@ -94,6 +106,13 @@ export default function ITDashboard() {
   const [pendingNotifications, setPendingNotifications] = useState<
     PendingITNotification[]
   >([]);
+  const [previewSecrets, setPreviewSecrets] = useState(false);
+  const [previewFull, setPreviewFull] = useState(false);
+  const requirePreviewPasscode = () => {
+    const code = prompt("Enter passcode to show passwords");
+    if (code === "1111") setPreviewSecrets(true);
+    else if (code !== null) alert("Incorrect passcode");
+  };
 
   useEffect(() => {
     const its = localStorage.getItem("itAccounts");
@@ -113,25 +132,7 @@ export default function ITDashboard() {
   }, []);
 
   const handleProcessEmployee = (notification: PendingITNotification) => {
-    // Mark notification as processed
-    const allNotifications = JSON.parse(
-      localStorage.getItem("pendingITNotifications") || "[]",
-    );
-    const updatedNotifications = allNotifications.map(
-      (n: PendingITNotification) =>
-        n.id === notification.id ? { ...n, processed: true } : n,
-    );
-    localStorage.setItem(
-      "pendingITNotifications",
-      JSON.stringify(updatedNotifications),
-    );
-
-    // Remove from current display
-    setPendingNotifications((prev) =>
-      prev.filter((n) => n.id !== notification.id),
-    );
-
-    // Navigate to IT form with pre-filled data
+    // Do NOT mark processed here. Keep notification until IT record is created.
     const urlParams = new URLSearchParams({
       employeeId: notification.employeeId,
       employeeName: notification.employeeName,
@@ -155,8 +156,14 @@ export default function ITDashboard() {
 
   const filtered = records.filter((r) => {
     const matchDept = deptFilter === "all" || r.department === deptFilter;
+    const providerLabel =
+      (r as any).vitelGlobal?.provider === "vonage"
+        ? "vonage"
+        : (r as any).vitelGlobal?.provider
+          ? "vitel"
+          : "vitel";
     const text =
-      `${r.employeeName} ${r.systemId} ${r.emails.map((e) => e.email).join(" ")} ${r.vitelGlobal.id || ""} ${r.vitelGlobal.extNumber || ""}`.toLowerCase();
+      `${r.employeeName} ${r.systemId} ${r.emails.map((e) => e.email).join(" ")} ${r.vitelGlobal?.id || ""} ${providerLabel}`.toLowerCase();
     const matchQuery = !query || text.includes(query.toLowerCase());
     return matchDept && matchQuery;
   });
@@ -471,10 +478,10 @@ export default function ITDashboard() {
                     <TableHead>System ID</TableHead>
                     <TableHead>Table</TableHead>
                     <TableHead>Emails</TableHead>
-                    <TableHead>Vitel ID</TableHead>
-                    <TableHead>Vitel Ext</TableHead>
-                    <TableHead>Vitel Password</TableHead>
+                    <TableHead>Provider</TableHead>
+                    <TableHead>Provider ID</TableHead>
                     <TableHead>LM Player</TableHead>
+                    <TableHead>Preview</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -490,15 +497,382 @@ export default function ITDashboard() {
                         {r.emails.map((e) => e.email).join(", ") || "-"}
                       </TableCell>
                       <TableCell>
-                        {r.vitelGlobal.id
-                          ? `${r.vitelGlobal.type}: ${r.vitelGlobal.id}`
+                        {r.vitelGlobal?.id
+                          ? (r as any).vitelGlobal?.provider === "vonage"
+                            ? "Vonage"
+                            : "Vitel Global"
                           : "-"}
                       </TableCell>
-                      <TableCell>{r.vitelGlobal.extNumber || "-"}</TableCell>
-                      <TableCell>
-                        {r.vitelGlobal.password ? "••••••" : "-"}
-                      </TableCell>
+                      <TableCell>{r.vitelGlobal?.id || "-"}</TableCell>
                       <TableCell>{r.lmPlayer.id || "-"}</TableCell>
+                      <TableCell>
+                        <Sheet>
+                          <SheetTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                            >
+                              <Eye className="h-4 w-4 mr-1" /> Preview
+                            </Button>
+                          </SheetTrigger>
+                          <SheetContent
+                            side="right"
+                            className="bg-slate-900 border-slate-700 text-white w-screen max-w-none h-screen overflow-y-auto"
+                          >
+                            <SheetHeader>
+                              <SheetTitle className="text-white">
+                                IT Account Preview
+                              </SheetTitle>
+                            </SheetHeader>
+                            <div className="mt-3 flex items-center justify-end gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="border-slate-600 text-slate-300"
+                                onClick={() => setPreviewFull((v) => !v)}
+                              >
+                                {previewFull
+                                  ? "Hide Details"
+                                  : "View Full Details"}
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="border-slate-600 text-slate-300"
+                                onClick={() =>
+                                  previewSecrets
+                                    ? setPreviewSecrets(false)
+                                    : requirePreviewPasscode()
+                                }
+                              >
+                                {previewSecrets
+                                  ? "Hide Passwords"
+                                  : "Show Passwords"}
+                              </Button>
+                            </div>
+                            <div className="mt-4 space-y-4 text-sm text-slate-300">
+                              {(() => {
+                                const emp =
+                                  (employees as any[]).find(
+                                    (e: any) => e.id === r.employeeId,
+                                  ) || null;
+                                const initials = (r.employeeName || "?")
+                                  .split(" ")
+                                  .map((x) => x[0])
+                                  .slice(0, 2)
+                                  .join("");
+                                return (
+                                  <div className="flex items-center gap-4">
+                                    <Avatar className="h-14 w-14">
+                                      <AvatarImage
+                                        src={
+                                          (emp && emp.photo) ||
+                                          "/placeholder.svg"
+                                        }
+                                        alt={r.employeeName}
+                                      />
+                                      <AvatarFallback>
+                                        {initials}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                      <div className="text-lg font-semibold text-white">
+                                        {r.employeeName}
+                                      </div>
+                                      <div className="text-slate-400 text-xs">
+                                        Emp ID:{" "}
+                                        {emp?.employeeId || r.employeeId}
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })()}
+
+                              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                                <div>
+                                  <div className="text-slate-400">
+                                    Department
+                                  </div>
+                                  <div className="text-white/90">
+                                    {r.department}
+                                  </div>
+                                </div>
+                                <div>
+                                  <div className="text-slate-400">
+                                    System ID
+                                  </div>
+                                  <div className="text-white/90">
+                                    {r.systemId}
+                                  </div>
+                                </div>
+                                <div>
+                                  <div className="text-slate-400">Table</div>
+                                  <div className="text-white/90">
+                                    {r.tableNumber}
+                                  </div>
+                                </div>
+                                <div>
+                                  <div className="text-slate-400">Provider</div>
+                                  <div className="text-white/90">
+                                    {r.vitelGlobal?.id
+                                      ? (r as any).vitelGlobal?.provider ===
+                                        "vonage"
+                                        ? "Vonage"
+                                        : "Vitel Global"
+                                      : "-"}
+                                  </div>
+                                </div>
+                                <div>
+                                  <div className="text-slate-400">
+                                    Provider ID
+                                  </div>
+                                  <div className="text-white/90">
+                                    {r.vitelGlobal?.id || "-"}
+                                  </div>
+                                </div>
+                                <div>
+                                  <div className="text-slate-400">
+                                    LM Player
+                                  </div>
+                                  <div className="text-white/90">
+                                    {r.lmPlayer?.id || "-"}
+                                  </div>
+                                </div>
+                                <div>
+                                  <div className="text-slate-400">License</div>
+                                  <div className="text-white/90">
+                                    {r.lmPlayer?.license || "-"}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div>
+                                <div className="text-slate-400 mb-1">
+                                  Emails
+                                </div>
+                                {(r.emails || []).length ? (
+                                  <div className="rounded border border-slate-700 bg-slate-800/30 divide-y divide-slate-700">
+                                    {(r.emails as any[]).map(
+                                      (e: any, i: number) => (
+                                        <div
+                                          key={i}
+                                          className="p-2 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs"
+                                        >
+                                          <div>
+                                            <div className="text-slate-500">
+                                              Provider
+                                            </div>
+                                            <div>
+                                              {e.providerCustom ||
+                                                e.provider ||
+                                                "-"}
+                                            </div>
+                                          </div>
+                                          <div>
+                                            <div className="text-slate-500">
+                                              Email
+                                            </div>
+                                            <div>{e.email || "-"}</div>
+                                          </div>
+                                          <div>
+                                            <div className="text-slate-500">
+                                              Password
+                                            </div>
+                                            <div>
+                                              {e.password
+                                                ? previewSecrets
+                                                  ? e.password
+                                                  : "••••••"
+                                                : "-"}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      ),
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="rounded border border-slate-700 bg-slate-800/30 p-2 text-xs">
+                                    -
+                                  </div>
+                                )}
+                              </div>
+
+                              {(() => {
+                                if (!previewFull) return null;
+                                const assetsRaw =
+                                  localStorage.getItem("systemAssets");
+                                const assets = assetsRaw
+                                  ? JSON.parse(assetsRaw)
+                                  : [];
+                                let providerAsset: any = null;
+                                if (
+                                  (r as any).vitelGlobal?.provider === "vonage"
+                                ) {
+                                  providerAsset = assets.find(
+                                    (a: any) =>
+                                      a.category === "vonage" &&
+                                      (a.id === r.vitelGlobal?.id ||
+                                        a.vonageExtCode === r.vitelGlobal?.id ||
+                                        a.vonageNumber === r.vitelGlobal?.id),
+                                  );
+                                } else {
+                                  providerAsset = assets.find(
+                                    (a: any) =>
+                                      (a.category === "vitel" ||
+                                        a.category === "vitel-global") &&
+                                      a.id === r.vitelGlobal?.id,
+                                  );
+                                }
+                                return (
+                                  <div className="rounded border border-slate-700 bg-slate-800/30 p-3">
+                                    <div className="font-medium text-white mb-2">
+                                      Provider Details
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                                      <div>
+                                        Category:{" "}
+                                        {providerAsset?.category ||
+                                          (r as any).vitelGlobal?.provider ||
+                                          "-"}
+                                      </div>
+                                      <div>ID: {r.vitelGlobal?.id || "-"}</div>
+                                      <div>
+                                        Vendor:{" "}
+                                        {providerAsset?.vendorName || "-"}
+                                      </div>
+                                      <div>
+                                        Company:{" "}
+                                        {providerAsset?.companyName || "-"}
+                                      </div>
+                                      <div>
+                                        Ext:{" "}
+                                        {providerAsset?.vonageExtCode || "-"}
+                                      </div>
+                                      <div>
+                                        Number:{" "}
+                                        {providerAsset?.vonageNumber || "-"}
+                                      </div>
+                                      <div>
+                                        Password:{" "}
+                                        {providerAsset?.vonagePassword
+                                          ? previewSecrets
+                                            ? providerAsset.vonagePassword
+                                            : "••••••"
+                                          : "-"}
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })()}
+
+                              {(() => {
+                                if (!previewFull) return null;
+                                const pcRaw =
+                                  localStorage.getItem("pcLaptopAssets");
+                                const pcs = pcRaw ? JSON.parse(pcRaw) : [];
+                                const pc =
+                                  pcs.find((x: any) => x.id === r.systemId) ||
+                                  {};
+                                const assetsRaw2 =
+                                  localStorage.getItem("systemAssets");
+                                const assets2 = assetsRaw2
+                                  ? JSON.parse(assetsRaw2)
+                                  : [];
+                                const nameFor = (id: string) => {
+                                  if (!id) return "-";
+                                  const a = assets2.find(
+                                    (t: any) => t.id === id,
+                                  );
+                                  return a
+                                    ? `${a.companyName || a.vendorName || "-"} (${a.id})`
+                                    : id;
+                                };
+                                const rows = [
+                                  {
+                                    label: "Mouse",
+                                    v: nameFor((pc as any).mouseId),
+                                  },
+                                  {
+                                    label: "Keyboard",
+                                    v: nameFor((pc as any).keyboardId),
+                                  },
+                                  {
+                                    label: "Motherboard",
+                                    v: nameFor((pc as any).motherboardId),
+                                  },
+                                  {
+                                    label: "Camera",
+                                    v: nameFor((pc as any).cameraId),
+                                  },
+                                  {
+                                    label: "Headphone",
+                                    v: nameFor((pc as any).headphoneId),
+                                  },
+                                  {
+                                    label: "Power Supply",
+                                    v: nameFor((pc as any).powerSupplyId),
+                                  },
+                                  {
+                                    label: "RAM",
+                                    v: nameFor((pc as any).ramId),
+                                  },
+                                  {
+                                    label: "Monitor",
+                                    v: nameFor((pc as any).monitorId),
+                                  },
+                                ];
+                                return (
+                                  <div className="rounded border border-slate-700 bg-slate-800/30 p-3">
+                                    <div className="font-medium text-white mb-2">
+                                      System Details
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                                      {rows.map((row) => (
+                                        <div key={row.label}>
+                                          <div className="text-slate-500">
+                                            {row.label}
+                                          </div>
+                                          <div>{row.v}</div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                );
+                              })()}
+
+                              {r.notes && (
+                                <div>
+                                  <div className="text-slate-400 mb-1">
+                                    Notes
+                                  </div>
+                                  <div className="rounded border border-slate-700 bg-slate-800/30 p-2 text-xs whitespace-pre-wrap">
+                                    {r.notes}
+                                  </div>
+                                </div>
+                              )}
+                              <div className="text-xs text-slate-500">
+                                Created:{" "}
+                                {new Date(r.createdAt).toLocaleString()}
+                              </div>
+
+                              <div className="flex justify-end gap-2 pt-2">
+                                <Button
+                                  className="bg-blue-500 hover:bg-blue-600 text-white"
+                                  onClick={() => {
+                                    const params = new URLSearchParams({
+                                      itId: r.id,
+                                    });
+                                    window.location.href = `/it?${params.toString()}`;
+                                  }}
+                                >
+                                  <Pencil className="h-4 w-4 mr-1" /> Edit IT
+                                </Button>
+                              </div>
+                            </div>
+                          </SheetContent>
+                        </Sheet>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

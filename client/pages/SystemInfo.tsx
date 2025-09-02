@@ -49,6 +49,13 @@ const items = [
     bg: "bg-amber-500/20",
   },
   {
+    name: "SSD/HDD",
+    slug: "storage",
+    Icon: HardDrive,
+    color: "text-emerald-400",
+    bg: "bg-emerald-500/20",
+  },
+  {
     name: "Power Supply",
     slug: "power-supply",
     Icon: PlugZap,
@@ -98,8 +105,10 @@ export default function SystemInfo() {
   const handleLoadDemo = () => {
     const newAssets = loadDemoData();
     if (newAssets.length > 0) {
-      setAssetCount(prev => prev + newAssets.length);
-      alert(`Loaded ${newAssets.length} demo system assets including mouse, keyboard, and other components!`);
+      setAssetCount((prev) => prev + newAssets.length);
+      alert(
+        `Loaded ${newAssets.length} demo system assets including mouse, keyboard, and other components!`,
+      );
     } else {
       alert("Demo data already exists in the system.");
     }
@@ -140,13 +149,14 @@ export default function SystemInfo() {
           {items.map(({ name, slug, Icon, color, bg }) => (
             <Card
               key={name}
-              className="bg-slate-900/50 border-slate-700 backdrop-blur-sm"
+              className="group relative overflow-hidden bg-slate-900/50 border-slate-700 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-blue-500/10 hover:border-slate-500/60"
             >
               <CardHeader>
+                <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 rounded-full bg-blue-500/5 blur-2xl transition-all duration-300 group-hover:bg-blue-500/15" />
                 <CardTitle className="text-white flex items-center justify-between">
                   <span>{name}</span>
                   <span
-                    className={`w-10 h-10 ${bg} rounded-lg flex items-center justify-center`}
+                    className={`w-10 h-10 ${bg} rounded-lg flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}
                   >
                     <Icon className={`h-5 w-5 ${color}`} />
                   </span>
@@ -155,7 +165,7 @@ export default function SystemInfo() {
               <CardContent className="flex items-center justify-end gap-2">
                 <Button
                   onClick={() => navigate(`/system-info/${slug}`)}
-                  className="bg-blue-500 hover:bg-blue-600 text-white"
+                  className="bg-blue-500 hover:bg-blue-600 text-white shadow-md hover:shadow-blue-500/20 transition-transform duration-300 hover:scale-105"
                 >
                   Go
                 </Button>

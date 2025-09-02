@@ -5,6 +5,13 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table,
   TableBody,
   TableCell,
@@ -85,6 +92,12 @@ const registry: Record<
     color: "text-teal-400",
     bg: "bg-teal-500/20",
   },
+  storage: {
+    title: "SSD/HDD",
+    Icon: HardDrive,
+    color: "text-emerald-400",
+    bg: "bg-emerald-500/20",
+  },
   vonage: {
     title: "Vonage",
     Icon: Phone,
@@ -150,6 +163,12 @@ export default function SystemInfoDetail() {
     vonageNumber: "",
     vonageExtCode: "",
     vonagePassword: "",
+    ramSize: "",
+    ramType: "",
+    processorModel: "",
+    storageType: "",
+    storageCapacity: "",
+    quantity: "1",
   });
 
   useEffect(() => {
@@ -174,6 +193,11 @@ export default function SystemInfoDetail() {
       vonageNumber: "",
       vonageExtCode: "",
       vonagePassword: "",
+      ramSize: "",
+      ramType: "",
+      processorModel: "",
+      storageType: "",
+      storageCapacity: "",
     });
     setShowForm(true);
   };
@@ -193,9 +217,10 @@ export default function SystemInfoDetail() {
         return;
       }
     } else {
+      const serialRequired = categoryKey !== "ram"; // allow auto serials for RAM
       if (
         !form.companyName ||
-        !form.serialNumber ||
+        (serialRequired && !form.serialNumber) ||
         !form.vendorName ||
         !form.purchaseDate ||
         !form.warrantyEndDate
@@ -204,10 +229,11 @@ export default function SystemInfoDetail() {
         return;
       }
     }
+
     const record: Asset = {
       id: form.id || nextWxId(assets, categoryKey),
       category: categoryKey,
-      serialNumber: form.serialNumber.trim(),
+      serialNumber: (form.serialNumber || "").trim(),
       vendorName: form.vendorName.trim(),
       companyName: form.companyName.trim(),
       purchaseDate: form.purchaseDate,
@@ -216,7 +242,20 @@ export default function SystemInfoDetail() {
       vonageNumber: form.vonageNumber?.trim(),
       vonageExtCode: form.vonageExtCode?.trim(),
       vonagePassword: form.vonagePassword,
+      ramSize: categoryKey === "ram" ? (form.ramSize || "").trim() : undefined,
+      ramType: categoryKey === "ram" ? (form.ramType || "").trim() : undefined,
+      processorModel:
+        categoryKey === "motherboard"
+          ? (form.processorModel || "").trim()
+          : undefined,
+      storageType:
+        categoryKey === "storage" ? (form.storageType || "").trim() : undefined,
+      storageCapacity:
+        categoryKey === "storage"
+          ? (form.storageCapacity || "").trim()
+          : undefined,
     };
+
     const next = [record, ...assets];
     setAssets(next);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
@@ -295,7 +334,7 @@ export default function SystemInfoDetail() {
                     <div className="space-y-2">
                       <Label className="text-slate-300">Company Name</Label>
                       <Input
-                        value={form.companyName}
+                        value={form.companyName || ""}
                         onChange={(e) =>
                           setForm((s) => ({
                             ...s,
@@ -309,7 +348,7 @@ export default function SystemInfoDetail() {
                     <div className="space-y-2">
                       <Label className="text-slate-300">Vonage Number</Label>
                       <Input
-                        value={form.vonageNumber}
+                        value={form.vonageNumber || ""}
                         onChange={(e) =>
                           setForm((s) => ({
                             ...s,
@@ -323,7 +362,7 @@ export default function SystemInfoDetail() {
                     <div className="space-y-2">
                       <Label className="text-slate-300">Extension Code</Label>
                       <Input
-                        value={form.vonageExtCode}
+                        value={form.vonageExtCode || ""}
                         onChange={(e) =>
                           setForm((s) => ({
                             ...s,
@@ -338,7 +377,7 @@ export default function SystemInfoDetail() {
                       <Label className="text-slate-300">Password</Label>
                       <Input
                         type="password"
-                        value={form.vonagePassword}
+                        value={form.vonagePassword || ""}
                         onChange={(e) =>
                           setForm((s) => ({
                             ...s,
@@ -353,7 +392,7 @@ export default function SystemInfoDetail() {
                       <Label className="text-slate-300">Purchase Date</Label>
                       <Input
                         type="date"
-                        value={form.purchaseDate}
+                        value={form.purchaseDate || ""}
                         onChange={(e) =>
                           setForm((s) => ({
                             ...s,
@@ -369,7 +408,7 @@ export default function SystemInfoDetail() {
                       </Label>
                       <Input
                         type="date"
-                        value={form.warrantyEndDate}
+                        value={form.warrantyEndDate || ""}
                         onChange={(e) =>
                           setForm((s) => ({
                             ...s,
@@ -385,7 +424,7 @@ export default function SystemInfoDetail() {
                     <div className="space-y-2">
                       <Label className="text-slate-300">Company Name</Label>
                       <Input
-                        value={form.companyName}
+                        value={form.companyName || ""}
                         onChange={(e) =>
                           setForm((s) => ({
                             ...s,
@@ -399,7 +438,7 @@ export default function SystemInfoDetail() {
                     <div className="space-y-2">
                       <Label className="text-slate-300">Serial Number</Label>
                       <Input
-                        value={form.serialNumber}
+                        value={form.serialNumber || ""}
                         onChange={(e) =>
                           setForm((s) => ({
                             ...s,
@@ -410,10 +449,138 @@ export default function SystemInfoDetail() {
                         placeholder="Enter serial"
                       />
                     </div>
+
+                    {categoryKey === "ram" && (
+                      <>
+                        <div className="space-y-2">
+                          <Label className="text-slate-300">RAM Size</Label>
+                          <Select
+                            value={form.ramSize}
+                            onValueChange={(v) =>
+                              setForm((s) => ({ ...s, ramSize: v }))
+                            }
+                          >
+                            <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                              <SelectValue placeholder="Select size" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                              {[
+                                "2GB",
+                                "4GB",
+                                "8GB",
+                                "16GB",
+                                "32GB",
+                                "64GB",
+                              ].map((sz) => (
+                                <SelectItem key={sz} value={sz}>
+                                  {sz}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-slate-300">RAM Type</Label>
+                          <Select
+                            value={form.ramType}
+                            onValueChange={(v) =>
+                              setForm((s) => ({ ...s, ramType: v }))
+                            }
+                          >
+                            <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                              <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                              {["DDR2", "DDR3", "DDR4", "DDR5"].map((t) => (
+                                <SelectItem key={t} value={t}>
+                                  {t}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </>
+                    )}
+
+                    {categoryKey === "motherboard" && (
+                      <div className="space-y-2">
+                        <Label className="text-slate-300">Processor</Label>
+                        <Select
+                          value={form.processorModel}
+                          onValueChange={(v) =>
+                            setForm((s) => ({ ...s, processorModel: v }))
+                          }
+                        >
+                          <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                            <SelectValue placeholder="Select processor" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                            {["i3", "i5", "i6", "i7", "i9"].map((p) => (
+                              <SelectItem key={p} value={p}>
+                                {p}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+
+                    {categoryKey === "storage" && (
+                      <>
+                        <div className="space-y-2">
+                          <Label className="text-slate-300">Storage Type</Label>
+                          <Select
+                            value={form.storageType}
+                            onValueChange={(v) =>
+                              setForm((s) => ({ ...s, storageType: v }))
+                            }
+                          >
+                            <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                              <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                              {["SSD", "HDD", "NVMe"].map((t) => (
+                                <SelectItem key={t} value={t}>
+                                  {t}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-slate-300">Capacity</Label>
+                          <Select
+                            value={form.storageCapacity}
+                            onValueChange={(v) =>
+                              setForm((s) => ({ ...s, storageCapacity: v }))
+                            }
+                          >
+                            <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                              <SelectValue placeholder="Select capacity" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
+                              {[
+                                "128GB",
+                                "256GB",
+                                "512GB",
+                                "1TB",
+                                "2TB",
+                                "4TB",
+                              ].map((c) => (
+                                <SelectItem key={c} value={c}>
+                                  {c}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </>
+                    )}
+
                     <div className="space-y-2">
                       <Label className="text-slate-300">Vendor Name</Label>
                       <Input
-                        value={form.vendorName}
+                        value={form.vendorName || ""}
                         onChange={(e) =>
                           setForm((s) => ({ ...s, vendorName: e.target.value }))
                         }
@@ -425,7 +592,7 @@ export default function SystemInfoDetail() {
                       <Label className="text-slate-300">Purchase Date</Label>
                       <Input
                         type="date"
-                        value={form.purchaseDate}
+                        value={form.purchaseDate || ""}
                         onChange={(e) =>
                           setForm((s) => ({
                             ...s,
@@ -441,7 +608,7 @@ export default function SystemInfoDetail() {
                       </Label>
                       <Input
                         type="date"
-                        value={form.warrantyEndDate}
+                        value={form.warrantyEndDate || ""}
                         onChange={(e) =>
                           setForm((s) => ({
                             ...s,
@@ -500,6 +667,21 @@ export default function SystemInfoDetail() {
                         <TableHead>ID</TableHead>
                         <TableHead>Company</TableHead>
                         <TableHead>Serial Number</TableHead>
+                        {categoryKey === "ram" && (
+                          <TableHead>RAM Size</TableHead>
+                        )}
+                        {categoryKey === "ram" && (
+                          <TableHead>RAM Type</TableHead>
+                        )}
+                        {categoryKey === "motherboard" && (
+                          <TableHead>Processor</TableHead>
+                        )}
+                        {categoryKey === "storage" && (
+                          <TableHead>Type</TableHead>
+                        )}
+                        {categoryKey === "storage" && (
+                          <TableHead>Capacity</TableHead>
+                        )}
                         <TableHead>Vendor</TableHead>
                         <TableHead>Purchase Date</TableHead>
                         <TableHead>Warranty End Date</TableHead>
@@ -523,6 +705,27 @@ export default function SystemInfoDetail() {
                           <TableCell className="font-medium">{a.id}</TableCell>
                           <TableCell>{a.companyName}</TableCell>
                           <TableCell>{a.serialNumber}</TableCell>
+                          {categoryKey === "ram" && (
+                            <TableCell>{(a as any).ramSize || "-"}</TableCell>
+                          )}
+                          {categoryKey === "ram" && (
+                            <TableCell>{(a as any).ramType || "-"}</TableCell>
+                          )}
+                          {categoryKey === "motherboard" && (
+                            <TableCell>
+                              {(a as any).processorModel || "-"}
+                            </TableCell>
+                          )}
+                          {categoryKey === "storage" && (
+                            <TableCell>
+                              {(a as any).storageType || "-"}
+                            </TableCell>
+                          )}
+                          {categoryKey === "storage" && (
+                            <TableCell>
+                              {(a as any).storageCapacity || "-"}
+                            </TableCell>
+                          )}
                           <TableCell>{a.vendorName}</TableCell>
                           <TableCell>{a.purchaseDate}</TableCell>
                           <TableCell>{a.warrantyEndDate}</TableCell>

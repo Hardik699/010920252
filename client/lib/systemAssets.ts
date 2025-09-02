@@ -12,6 +12,14 @@ export type Asset = {
   vonageNumber?: string;
   vonageExtCode?: string;
   vonagePassword?: string;
+  // RAM-specific optional fields
+  ramSize?: string; // e.g., 2GB, 4GB, 8GB, 16GB
+  ramType?: string; // e.g., DDR2, DDR3, DDR4, DDR5
+  // Motherboard-specific optional field
+  processorModel?: string; // e.g., i3, i5, i6, i7, i9
+  // Storage-specific optional fields
+  storageType?: string; // SSD or HDD
+  storageCapacity?: string; // e.g., 128GB, 256GB, 512GB, 1TB, 2TB
 };
 
 export const STORAGE_KEY = "systemAssets";
@@ -36,6 +44,8 @@ export function categoryCodeFor(category: string): string {
       return "MN";
     case "vonage":
       return "V";
+    case "storage":
+      return "ST";
     default:
       return "X";
   }
@@ -80,4 +90,8 @@ export const canonical: Record<string, string> = {
   rem: "ram",
   hadphone: "headphone",
   moniter: "monitor",
+  ssd: "storage",
+  hdd: "storage",
+  "hard-disk": "storage",
+  storage: "storage",
 };
