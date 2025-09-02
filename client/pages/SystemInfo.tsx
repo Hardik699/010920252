@@ -49,6 +49,13 @@ const items = [
     bg: "bg-amber-500/20",
   },
   {
+    name: "SSD/HDD",
+    slug: "storage",
+    Icon: HardDrive,
+    color: "text-emerald-400",
+    bg: "bg-emerald-500/20",
+  },
+  {
     name: "Power Supply",
     slug: "power-supply",
     Icon: PlugZap,
