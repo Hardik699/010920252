@@ -299,6 +299,7 @@ export default function PCLaptopInfo() {
       cameraId: "none",
       headphoneId: "none",
       powerSupplyId: "none",
+      storageId: "none",
       ramId: "none",
       ramId2: "none",
     });
