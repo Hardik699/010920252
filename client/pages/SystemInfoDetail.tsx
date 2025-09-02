@@ -479,18 +479,6 @@ export default function SystemInfoDetail() {
                             </SelectContent>
                           </Select>
                         </div>
-                        <div className="space-y-2">
-                          <Label className="text-slate-300">Quantity</Label>
-                          <Input
-                            type="number"
-                            min={1}
-                            max={32}
-                            value={form.quantity || "1"}
-                            onChange={(e) => setForm((s) => ({ ...s, quantity: e.target.value }))}
-                            className="bg-slate-800/50 border-slate-700 text-white"
-                            placeholder="How many modules?"
-                          />
-                        </div>
                       </>
                     )}
 
