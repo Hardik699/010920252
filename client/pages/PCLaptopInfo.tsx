@@ -169,7 +169,11 @@ export default function PCLaptopInfo() {
     const usedCameraIds = getUsedIds(itemsToCheck, 'cameraId');
     const usedHeadphoneIds = getUsedIds(itemsToCheck, 'headphoneId');
     const usedPowerSupplyIds = getUsedIds(itemsToCheck, 'powerSupplyId');
-    const usedRamIds = getUsedIds(itemsToCheck, 'ramId');
+    const usedStorageIds = getUsedIds(itemsToCheck as any, 'storageId' as any);
+    const usedRamIds = Array.from(new Set([
+      ...getUsedIds(itemsToCheck, 'ramId'),
+      ...getUsedIds(itemsToCheck as any, 'ramId2' as any),
+    ]));
 
     // Get fresh available assets
     const freshMouseAssets = getAvailableAssets(sysList.filter((s) => s.category === "mouse"), usedMouseIds);
@@ -178,6 +182,7 @@ export default function PCLaptopInfo() {
     const freshCameraAssets = getAvailableAssets(sysList.filter((s) => s.category === "camera"), usedCameraIds);
     const freshHeadphoneAssets = getAvailableAssets(sysList.filter((s) => s.category === "headphone"), usedHeadphoneIds);
     const freshPowerSupplyAssets = getAvailableAssets(sysList.filter((s) => s.category === "power-supply"), usedPowerSupplyIds);
+    const freshStorageAssets = getAvailableAssets(sysList.filter((s) => s.category === "storage"), usedStorageIds);
     const freshRamAssets = getAvailableAssets(sysList.filter((s) => s.category === "ram"), usedRamIds);
 
     // Update state with fresh data
@@ -187,6 +192,7 @@ export default function PCLaptopInfo() {
     setCameraAssets(freshCameraAssets);
     setHeadphoneAssets(freshHeadphoneAssets);
     setPowerSupplyAssets(freshPowerSupplyAssets);
+    setStorageAssets(freshStorageAssets);
     setRamAssets(freshRamAssets);
 
     if (itemToEdit) {
@@ -200,6 +206,7 @@ export default function PCLaptopInfo() {
         cameraId: itemToEdit.cameraId || "none",
         headphoneId: itemToEdit.headphoneId || "none",
         powerSupplyId: itemToEdit.powerSupplyId || "none",
+        storageId: (itemToEdit as any).storageId || "none",
         ramId: itemToEdit.ramId || "none",
         ramId2: itemToEdit.ramId2 || "none",
       });
@@ -215,6 +222,7 @@ export default function PCLaptopInfo() {
         cameraId: "none",
         headphoneId: "none",
         powerSupplyId: "none",
+        storageId: "none",
         ramId: "none",
         ramId2: "none",
       });
