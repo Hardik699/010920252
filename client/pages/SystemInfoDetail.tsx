@@ -4,7 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -170,12 +176,10 @@ export default function SystemInfoDetail() {
     setAssets(raw ? JSON.parse(raw) : []);
   }, []);
 
-
   const filtered = useMemo(
     () => assets.filter((a) => a.category === categoryKey),
     [assets, categoryKey],
   );
-
 
   const openForm = () => {
     const id = nextWxId(assets, categoryKey);
@@ -240,9 +244,16 @@ export default function SystemInfoDetail() {
       vonagePassword: form.vonagePassword,
       ramSize: categoryKey === "ram" ? (form.ramSize || "").trim() : undefined,
       ramType: categoryKey === "ram" ? (form.ramType || "").trim() : undefined,
-      processorModel: categoryKey === "motherboard" ? (form.processorModel || "").trim() : undefined,
-      storageType: categoryKey === "storage" ? (form.storageType || "").trim() : undefined,
-      storageCapacity: categoryKey === "storage" ? (form.storageCapacity || "").trim() : undefined,
+      processorModel:
+        categoryKey === "motherboard"
+          ? (form.processorModel || "").trim()
+          : undefined,
+      storageType:
+        categoryKey === "storage" ? (form.storageType || "").trim() : undefined,
+      storageCapacity:
+        categoryKey === "storage"
+          ? (form.storageCapacity || "").trim()
+          : undefined,
     };
 
     const next = [record, ...assets];
@@ -443,26 +454,47 @@ export default function SystemInfoDetail() {
                       <>
                         <div className="space-y-2">
                           <Label className="text-slate-300">RAM Size</Label>
-                          <Select value={form.ramSize} onValueChange={(v) => setForm((s) => ({ ...s, ramSize: v }))}>
+                          <Select
+                            value={form.ramSize}
+                            onValueChange={(v) =>
+                              setForm((s) => ({ ...s, ramSize: v }))
+                            }
+                          >
                             <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
                               <SelectValue placeholder="Select size" />
                             </SelectTrigger>
                             <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
-                              {['2GB','4GB','8GB','16GB','32GB','64GB'].map((sz) => (
-                                <SelectItem key={sz} value={sz}>{sz}</SelectItem>
+                              {[
+                                "2GB",
+                                "4GB",
+                                "8GB",
+                                "16GB",
+                                "32GB",
+                                "64GB",
+                              ].map((sz) => (
+                                <SelectItem key={sz} value={sz}>
+                                  {sz}
+                                </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
                         </div>
                         <div className="space-y-2">
                           <Label className="text-slate-300">RAM Type</Label>
-                          <Select value={form.ramType} onValueChange={(v) => setForm((s) => ({ ...s, ramType: v }))}>
+                          <Select
+                            value={form.ramType}
+                            onValueChange={(v) =>
+                              setForm((s) => ({ ...s, ramType: v }))
+                            }
+                          >
                             <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
                               <SelectValue placeholder="Select type" />
                             </SelectTrigger>
                             <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
-                              {['DDR2','DDR3','DDR4','DDR5'].map((t) => (
-                                <SelectItem key={t} value={t}>{t}</SelectItem>
+                              {["DDR2", "DDR3", "DDR4", "DDR5"].map((t) => (
+                                <SelectItem key={t} value={t}>
+                                  {t}
+                                </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
@@ -473,13 +505,20 @@ export default function SystemInfoDetail() {
                     {categoryKey === "motherboard" && (
                       <div className="space-y-2">
                         <Label className="text-slate-300">Processor</Label>
-                        <Select value={form.processorModel} onValueChange={(v) => setForm((s) => ({ ...s, processorModel: v }))}>
+                        <Select
+                          value={form.processorModel}
+                          onValueChange={(v) =>
+                            setForm((s) => ({ ...s, processorModel: v }))
+                          }
+                        >
                           <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
                             <SelectValue placeholder="Select processor" />
                           </SelectTrigger>
                           <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
-                            {['i3','i5','i6','i7','i9'].map((p) => (
-                              <SelectItem key={p} value={p}>{p}</SelectItem>
+                            {["i3", "i5", "i6", "i7", "i9"].map((p) => (
+                              <SelectItem key={p} value={p}>
+                                {p}
+                              </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -490,26 +529,47 @@ export default function SystemInfoDetail() {
                       <>
                         <div className="space-y-2">
                           <Label className="text-slate-300">Storage Type</Label>
-                          <Select value={form.storageType} onValueChange={(v) => setForm((s) => ({ ...s, storageType: v }))}>
+                          <Select
+                            value={form.storageType}
+                            onValueChange={(v) =>
+                              setForm((s) => ({ ...s, storageType: v }))
+                            }
+                          >
                             <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
                               <SelectValue placeholder="Select type" />
                             </SelectTrigger>
                             <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
-                              {['SSD','HDD','NVMe'].map((t) => (
-                                <SelectItem key={t} value={t}>{t}</SelectItem>
+                              {["SSD", "HDD", "NVMe"].map((t) => (
+                                <SelectItem key={t} value={t}>
+                                  {t}
+                                </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
                         </div>
                         <div className="space-y-2">
                           <Label className="text-slate-300">Capacity</Label>
-                          <Select value={form.storageCapacity} onValueChange={(v) => setForm((s) => ({ ...s, storageCapacity: v }))}>
+                          <Select
+                            value={form.storageCapacity}
+                            onValueChange={(v) =>
+                              setForm((s) => ({ ...s, storageCapacity: v }))
+                            }
+                          >
                             <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
                               <SelectValue placeholder="Select capacity" />
                             </SelectTrigger>
                             <SelectContent className="bg-slate-800 border-slate-700 text-white max-h-64">
-                              {['128GB','256GB','512GB','1TB','2TB','4TB'].map((c) => (
-                                <SelectItem key={c} value={c}>{c}</SelectItem>
+                              {[
+                                "128GB",
+                                "256GB",
+                                "512GB",
+                                "1TB",
+                                "2TB",
+                                "4TB",
+                              ].map((c) => (
+                                <SelectItem key={c} value={c}>
+                                  {c}
+                                </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
@@ -607,11 +667,21 @@ export default function SystemInfoDetail() {
                         <TableHead>ID</TableHead>
                         <TableHead>Company</TableHead>
                         <TableHead>Serial Number</TableHead>
-                        {categoryKey === "ram" && <TableHead>RAM Size</TableHead>}
-                        {categoryKey === "ram" && <TableHead>RAM Type</TableHead>}
-                        {categoryKey === "motherboard" && <TableHead>Processor</TableHead>}
-                        {categoryKey === "storage" && <TableHead>Type</TableHead>}
-                        {categoryKey === "storage" && <TableHead>Capacity</TableHead>}
+                        {categoryKey === "ram" && (
+                          <TableHead>RAM Size</TableHead>
+                        )}
+                        {categoryKey === "ram" && (
+                          <TableHead>RAM Type</TableHead>
+                        )}
+                        {categoryKey === "motherboard" && (
+                          <TableHead>Processor</TableHead>
+                        )}
+                        {categoryKey === "storage" && (
+                          <TableHead>Type</TableHead>
+                        )}
+                        {categoryKey === "storage" && (
+                          <TableHead>Capacity</TableHead>
+                        )}
                         <TableHead>Vendor</TableHead>
                         <TableHead>Purchase Date</TableHead>
                         <TableHead>Warranty End Date</TableHead>
@@ -635,11 +705,27 @@ export default function SystemInfoDetail() {
                           <TableCell className="font-medium">{a.id}</TableCell>
                           <TableCell>{a.companyName}</TableCell>
                           <TableCell>{a.serialNumber}</TableCell>
-                          {categoryKey === "ram" && <TableCell>{(a as any).ramSize || "-"}</TableCell>}
-                          {categoryKey === "ram" && <TableCell>{(a as any).ramType || "-"}</TableCell>}
-                          {categoryKey === "motherboard" && <TableCell>{(a as any).processorModel || "-"}</TableCell>}
-                          {categoryKey === "storage" && <TableCell>{(a as any).storageType || "-"}</TableCell>}
-                          {categoryKey === "storage" && <TableCell>{(a as any).storageCapacity || "-"}</TableCell>}
+                          {categoryKey === "ram" && (
+                            <TableCell>{(a as any).ramSize || "-"}</TableCell>
+                          )}
+                          {categoryKey === "ram" && (
+                            <TableCell>{(a as any).ramType || "-"}</TableCell>
+                          )}
+                          {categoryKey === "motherboard" && (
+                            <TableCell>
+                              {(a as any).processorModel || "-"}
+                            </TableCell>
+                          )}
+                          {categoryKey === "storage" && (
+                            <TableCell>
+                              {(a as any).storageType || "-"}
+                            </TableCell>
+                          )}
+                          {categoryKey === "storage" && (
+                            <TableCell>
+                              {(a as any).storageCapacity || "-"}
+                            </TableCell>
+                          )}
                           <TableCell>{a.vendorName}</TableCell>
                           <TableCell>{a.purchaseDate}</TableCell>
                           <TableCell>{a.warrantyEndDate}</TableCell>

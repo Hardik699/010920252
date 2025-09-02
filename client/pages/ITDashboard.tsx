@@ -516,7 +516,10 @@ export default function ITDashboard() {
                               <Eye className="h-4 w-4 mr-1" /> Preview
                             </Button>
                           </SheetTrigger>
-                          <SheetContent side="right" className="bg-slate-900 border-slate-700 text-white w-screen max-w-none h-screen overflow-y-auto">
+                          <SheetContent
+                            side="right"
+                            className="bg-slate-900 border-slate-700 text-white w-screen max-w-none h-screen overflow-y-auto"
+                          >
                             <SheetHeader>
                               <SheetTitle className="text-white">
                                 IT Account Preview
@@ -529,15 +532,23 @@ export default function ITDashboard() {
                                 className="border-slate-600 text-slate-300"
                                 onClick={() => setPreviewFull((v) => !v)}
                               >
-                                {previewFull ? "Hide Details" : "View Full Details"}
+                                {previewFull
+                                  ? "Hide Details"
+                                  : "View Full Details"}
                               </Button>
                               <Button
                                 variant="outline"
                                 size="sm"
                                 className="border-slate-600 text-slate-300"
-                                onClick={() => (previewSecrets ? setPreviewSecrets(false) : requirePreviewPasscode())}
+                                onClick={() =>
+                                  previewSecrets
+                                    ? setPreviewSecrets(false)
+                                    : requirePreviewPasscode()
+                                }
                               >
-                                {previewSecrets ? "Hide Passwords" : "Show Passwords"}
+                                {previewSecrets
+                                  ? "Hide Passwords"
+                                  : "Show Passwords"}
                               </Button>
                             </div>
                             <div className="mt-4 space-y-4 text-sm text-slate-300">
@@ -637,37 +648,67 @@ export default function ITDashboard() {
                               </div>
 
                               <div>
-                                <div className="text-slate-400 mb-1">Emails</div>
+                                <div className="text-slate-400 mb-1">
+                                  Emails
+                                </div>
                                 {(r.emails || []).length ? (
                                   <div className="rounded border border-slate-700 bg-slate-800/30 divide-y divide-slate-700">
-                                    {(r.emails as any[]).map((e: any, i: number) => (
-                                      <div key={i} className="p-2 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-                                        <div>
-                                          <div className="text-slate-500">Provider</div>
-                                          <div>{e.providerCustom || e.provider || "-"}</div>
+                                    {(r.emails as any[]).map(
+                                      (e: any, i: number) => (
+                                        <div
+                                          key={i}
+                                          className="p-2 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs"
+                                        >
+                                          <div>
+                                            <div className="text-slate-500">
+                                              Provider
+                                            </div>
+                                            <div>
+                                              {e.providerCustom ||
+                                                e.provider ||
+                                                "-"}
+                                            </div>
+                                          </div>
+                                          <div>
+                                            <div className="text-slate-500">
+                                              Email
+                                            </div>
+                                            <div>{e.email || "-"}</div>
+                                          </div>
+                                          <div>
+                                            <div className="text-slate-500">
+                                              Password
+                                            </div>
+                                            <div>
+                                              {e.password
+                                                ? previewSecrets
+                                                  ? e.password
+                                                  : "••••••"
+                                                : "-"}
+                                            </div>
+                                          </div>
                                         </div>
-                                        <div>
-                                          <div className="text-slate-500">Email</div>
-                                          <div>{e.email || "-"}</div>
-                                        </div>
-                                        <div>
-                                          <div className="text-slate-500">Password</div>
-                                          <div>{e.password ? (previewSecrets ? e.password : "••••••") : "-"}</div>
-                                        </div>
-                                      </div>
-                                    ))}
+                                      ),
+                                    )}
                                   </div>
                                 ) : (
-                                  <div className="rounded border border-slate-700 bg-slate-800/30 p-2 text-xs">-</div>
+                                  <div className="rounded border border-slate-700 bg-slate-800/30 p-2 text-xs">
+                                    -
+                                  </div>
                                 )}
                               </div>
 
                               {(() => {
                                 if (!previewFull) return null;
-                                const assetsRaw = localStorage.getItem("systemAssets");
-                                const assets = assetsRaw ? JSON.parse(assetsRaw) : [];
+                                const assetsRaw =
+                                  localStorage.getItem("systemAssets");
+                                const assets = assetsRaw
+                                  ? JSON.parse(assetsRaw)
+                                  : [];
                                 let providerAsset: any = null;
-                                if ((r as any).vitelGlobal?.provider === "vonage") {
+                                if (
+                                  (r as any).vitelGlobal?.provider === "vonage"
+                                ) {
                                   providerAsset = assets.find(
                                     (a: any) =>
                                       a.category === "vonage" &&
@@ -678,21 +719,48 @@ export default function ITDashboard() {
                                 } else {
                                   providerAsset = assets.find(
                                     (a: any) =>
-                                      (a.category === "vitel" || a.category === "vitel-global") &&
+                                      (a.category === "vitel" ||
+                                        a.category === "vitel-global") &&
                                       a.id === r.vitelGlobal?.id,
                                   );
                                 }
                                 return (
                                   <div className="rounded border border-slate-700 bg-slate-800/30 p-3">
-                                    <div className="font-medium text-white mb-2">Provider Details</div>
+                                    <div className="font-medium text-white mb-2">
+                                      Provider Details
+                                    </div>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-                                      <div>Category: {providerAsset?.category || (r as any).vitelGlobal?.provider || "-"}</div>
+                                      <div>
+                                        Category:{" "}
+                                        {providerAsset?.category ||
+                                          (r as any).vitelGlobal?.provider ||
+                                          "-"}
+                                      </div>
                                       <div>ID: {r.vitelGlobal?.id || "-"}</div>
-                                      <div>Vendor: {providerAsset?.vendorName || "-"}</div>
-                                      <div>Company: {providerAsset?.companyName || "-"}</div>
-                                      <div>Ext: {providerAsset?.vonageExtCode || "-"}</div>
-                                      <div>Number: {providerAsset?.vonageNumber || "-"}</div>
-                                      <div>Password: {providerAsset?.vonagePassword ? (previewSecrets ? providerAsset.vonagePassword : "••••••") : "-"}</div>
+                                      <div>
+                                        Vendor:{" "}
+                                        {providerAsset?.vendorName || "-"}
+                                      </div>
+                                      <div>
+                                        Company:{" "}
+                                        {providerAsset?.companyName || "-"}
+                                      </div>
+                                      <div>
+                                        Ext:{" "}
+                                        {providerAsset?.vonageExtCode || "-"}
+                                      </div>
+                                      <div>
+                                        Number:{" "}
+                                        {providerAsset?.vonageNumber || "-"}
+                                      </div>
+                                      <div>
+                                        Password:{" "}
+                                        {providerAsset?.vonagePassword
+                                          ? previewSecrets
+                                            ? providerAsset.vonagePassword
+                                            : "••••••"
+                                          : "-"}
+                                      </div>
                                     </div>
                                   </div>
                                 );
@@ -700,33 +768,71 @@ export default function ITDashboard() {
 
                               {(() => {
                                 if (!previewFull) return null;
-                                const pcRaw = localStorage.getItem("pcLaptopAssets");
+                                const pcRaw =
+                                  localStorage.getItem("pcLaptopAssets");
                                 const pcs = pcRaw ? JSON.parse(pcRaw) : [];
-                                const pc = pcs.find((x: any) => x.id === r.systemId) || {};
-                                const assetsRaw2 = localStorage.getItem("systemAssets");
-                                const assets2 = assetsRaw2 ? JSON.parse(assetsRaw2) : [];
+                                const pc =
+                                  pcs.find((x: any) => x.id === r.systemId) ||
+                                  {};
+                                const assetsRaw2 =
+                                  localStorage.getItem("systemAssets");
+                                const assets2 = assetsRaw2
+                                  ? JSON.parse(assetsRaw2)
+                                  : [];
                                 const nameFor = (id: string) => {
                                   if (!id) return "-";
-                                  const a = assets2.find((t: any) => t.id === id);
-                                  return a ? `${a.companyName || a.vendorName || "-"} (${a.id})` : id;
+                                  const a = assets2.find(
+                                    (t: any) => t.id === id,
+                                  );
+                                  return a
+                                    ? `${a.companyName || a.vendorName || "-"} (${a.id})`
+                                    : id;
                                 };
                                 const rows = [
-                                  { label: "Mouse", v: nameFor((pc as any).mouseId) },
-                                  { label: "Keyboard", v: nameFor((pc as any).keyboardId) },
-                                  { label: "Motherboard", v: nameFor((pc as any).motherboardId) },
-                                  { label: "Camera", v: nameFor((pc as any).cameraId) },
-                                  { label: "Headphone", v: nameFor((pc as any).headphoneId) },
-                                  { label: "Power Supply", v: nameFor((pc as any).powerSupplyId) },
-                                  { label: "RAM", v: nameFor((pc as any).ramId) },
-                                  { label: "Monitor", v: nameFor((pc as any).monitorId) },
+                                  {
+                                    label: "Mouse",
+                                    v: nameFor((pc as any).mouseId),
+                                  },
+                                  {
+                                    label: "Keyboard",
+                                    v: nameFor((pc as any).keyboardId),
+                                  },
+                                  {
+                                    label: "Motherboard",
+                                    v: nameFor((pc as any).motherboardId),
+                                  },
+                                  {
+                                    label: "Camera",
+                                    v: nameFor((pc as any).cameraId),
+                                  },
+                                  {
+                                    label: "Headphone",
+                                    v: nameFor((pc as any).headphoneId),
+                                  },
+                                  {
+                                    label: "Power Supply",
+                                    v: nameFor((pc as any).powerSupplyId),
+                                  },
+                                  {
+                                    label: "RAM",
+                                    v: nameFor((pc as any).ramId),
+                                  },
+                                  {
+                                    label: "Monitor",
+                                    v: nameFor((pc as any).monitorId),
+                                  },
                                 ];
                                 return (
                                   <div className="rounded border border-slate-700 bg-slate-800/30 p-3">
-                                    <div className="font-medium text-white mb-2">System Details</div>
+                                    <div className="font-medium text-white mb-2">
+                                      System Details
+                                    </div>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs">
                                       {rows.map((row) => (
                                         <div key={row.label}>
-                                          <div className="text-slate-500">{row.label}</div>
+                                          <div className="text-slate-500">
+                                            {row.label}
+                                          </div>
                                           <div>{row.v}</div>
                                         </div>
                                       ))}
