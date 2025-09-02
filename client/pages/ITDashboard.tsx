@@ -516,7 +516,7 @@ export default function ITDashboard() {
                               <Eye className="h-4 w-4 mr-1" /> Preview
                             </Button>
                           </SheetTrigger>
-                          <SheetContent className="bg-slate-900 border-slate-700 text-white w-full sm:max-w-2xl">
+                          <SheetContent side="right" className="bg-slate-900 border-slate-700 text-white w-screen max-w-none h-screen overflow-y-auto">
                             <SheetHeader>
                               <SheetTitle className="text-white">
                                 IT Account Preview
