@@ -192,6 +192,7 @@ export default function PCLaptopInfo() {
         headphoneId: itemToEdit.headphoneId || "none",
         powerSupplyId: itemToEdit.powerSupplyId || "none",
         ramId: itemToEdit.ramId || "none",
+        ramId2: itemToEdit.ramId2 || "none",
       });
     } else {
       // Add mode - generate new ID and set defaults
