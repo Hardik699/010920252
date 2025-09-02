@@ -335,7 +335,7 @@ export default function SystemInfoDetail() {
                     <div className="space-y-2">
                       <Label className="text-slate-300">Company Name</Label>
                       <Input
-                        value={form.companyName}
+                        value={form.companyName || ""}
                         onChange={(e) =>
                           setForm((s) => ({
                             ...s,
@@ -349,7 +349,7 @@ export default function SystemInfoDetail() {
                     <div className="space-y-2">
                       <Label className="text-slate-300">Vonage Number</Label>
                       <Input
-                        value={form.vonageNumber}
+                        value={form.vonageNumber || ""}
                         onChange={(e) =>
                           setForm((s) => ({
                             ...s,
@@ -363,7 +363,7 @@ export default function SystemInfoDetail() {
                     <div className="space-y-2">
                       <Label className="text-slate-300">Extension Code</Label>
                       <Input
-                        value={form.vonageExtCode}
+                        value={form.vonageExtCode || ""}
                         onChange={(e) =>
                           setForm((s) => ({
                             ...s,
@@ -378,7 +378,7 @@ export default function SystemInfoDetail() {
                       <Label className="text-slate-300">Password</Label>
                       <Input
                         type="password"
-                        value={form.vonagePassword}
+                        value={form.vonagePassword || ""}
                         onChange={(e) =>
                           setForm((s) => ({
                             ...s,
@@ -393,7 +393,7 @@ export default function SystemInfoDetail() {
                       <Label className="text-slate-300">Purchase Date</Label>
                       <Input
                         type="date"
-                        value={form.purchaseDate}
+                        value={form.purchaseDate || ""}
                         onChange={(e) =>
                           setForm((s) => ({
                             ...s,
@@ -409,7 +409,7 @@ export default function SystemInfoDetail() {
                       </Label>
                       <Input
                         type="date"
-                        value={form.warrantyEndDate}
+                        value={form.warrantyEndDate || ""}
                         onChange={(e) =>
                           setForm((s) => ({
                             ...s,
@@ -425,7 +425,7 @@ export default function SystemInfoDetail() {
                     <div className="space-y-2">
                       <Label className="text-slate-300">Company Name</Label>
                       <Input
-                        value={form.companyName}
+                        value={form.companyName || ""}
                         onChange={(e) =>
                           setForm((s) => ({
                             ...s,
@@ -439,7 +439,7 @@ export default function SystemInfoDetail() {
                     <div className="space-y-2">
                       <Label className="text-slate-300">Serial Number</Label>
                       <Input
-                        value={form.serialNumber}
+                        value={form.serialNumber || ""}
                         onChange={(e) =>
                           setForm((s) => ({
                             ...s,
@@ -485,7 +485,7 @@ export default function SystemInfoDetail() {
                             type="number"
                             min={1}
                             max={32}
-                            value={form.quantity}
+                            value={form.quantity || "1"}
                             onChange={(e) => setForm((s) => ({ ...s, quantity: e.target.value }))}
                             className="bg-slate-800/50 border-slate-700 text-white"
                             placeholder="How many modules?"
@@ -544,7 +544,7 @@ export default function SystemInfoDetail() {
                     <div className="space-y-2">
                       <Label className="text-slate-300">Vendor Name</Label>
                       <Input
-                        value={form.vendorName}
+                        value={form.vendorName || ""}
                         onChange={(e) =>
                           setForm((s) => ({ ...s, vendorName: e.target.value }))
                         }
@@ -556,7 +556,7 @@ export default function SystemInfoDetail() {
                       <Label className="text-slate-300">Purchase Date</Label>
                       <Input
                         type="date"
-                        value={form.purchaseDate}
+                        value={form.purchaseDate || ""}
                         onChange={(e) =>
                           setForm((s) => ({
                             ...s,
@@ -572,7 +572,7 @@ export default function SystemInfoDetail() {
                       </Label>
                       <Input
                         type="date"
-                        value={form.warrantyEndDate}
+                        value={form.warrantyEndDate || ""}
                         onChange={(e) =>
                           setForm((s) => ({
                             ...s,
