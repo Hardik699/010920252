@@ -73,7 +73,9 @@ export default function PCLaptopInfo() {
     cameraId: "",
     headphoneId: "",
     powerSupplyId: "",
+    storageId: "",
     ramId: "",
+    ramId2: "",
   });
 
   // Helper function to get used IDs for a specific component type
