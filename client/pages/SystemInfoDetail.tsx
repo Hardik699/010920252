@@ -150,6 +150,8 @@ export default function SystemInfoDetail() {
     vonageNumber: "",
     vonageExtCode: "",
     vonagePassword: "",
+    ramSize: "",
+    ramType: "",
   });
 
   useEffect(() => {
@@ -174,6 +176,8 @@ export default function SystemInfoDetail() {
       vonageNumber: "",
       vonageExtCode: "",
       vonagePassword: "",
+      ramSize: "",
+      ramType: "",
     });
     setShowForm(true);
   };
@@ -216,6 +220,8 @@ export default function SystemInfoDetail() {
       vonageNumber: form.vonageNumber?.trim(),
       vonageExtCode: form.vonageExtCode?.trim(),
       vonagePassword: form.vonagePassword,
+      ramSize: categoryKey === "ram" ? (form.ramSize || "").trim() : undefined,
+      ramType: categoryKey === "ram" ? (form.ramType || "").trim() : undefined,
     };
     const next = [record, ...assets];
     setAssets(next);
@@ -410,6 +416,30 @@ export default function SystemInfoDetail() {
                         placeholder="Enter serial"
                       />
                     </div>
+
+                    {categoryKey === "ram" && (
+                      <>
+                        <div className="space-y-2">
+                          <Label className="text-slate-300">RAM Size</Label>
+                          <Input
+                            value={form.ramSize}
+                            onChange={(e) => setForm((s) => ({ ...s, ramSize: e.target.value }))}
+                            className="bg-slate-800/50 border-slate-700 text-white"
+                            placeholder="e.g., 2GB, 4GB, 8GB, 16GB"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-slate-300">RAM Type</Label>
+                          <Input
+                            value={form.ramType}
+                            onChange={(e) => setForm((s) => ({ ...s, ramType: e.target.value }))}
+                            className="bg-slate-800/50 border-slate-700 text-white"
+                            placeholder="e.g., DDR2, DDR3, DDR4, DDR5"
+                          />
+                        </div>
+                      </>
+                    )}
+
                     <div className="space-y-2">
                       <Label className="text-slate-300">Vendor Name</Label>
                       <Input
@@ -500,6 +530,8 @@ export default function SystemInfoDetail() {
                         <TableHead>ID</TableHead>
                         <TableHead>Company</TableHead>
                         <TableHead>Serial Number</TableHead>
+                        {categoryKey === "ram" && <TableHead>RAM Size</TableHead>}
+                        {categoryKey === "ram" && <TableHead>RAM Type</TableHead>}
                         <TableHead>Vendor</TableHead>
                         <TableHead>Purchase Date</TableHead>
                         <TableHead>Warranty End Date</TableHead>
@@ -523,6 +555,8 @@ export default function SystemInfoDetail() {
                           <TableCell className="font-medium">{a.id}</TableCell>
                           <TableCell>{a.companyName}</TableCell>
                           <TableCell>{a.serialNumber}</TableCell>
+                          {categoryKey === "ram" && <TableCell>{(a as any).ramSize || "-"}</TableCell>}
+                          {categoryKey === "ram" && <TableCell>{(a as any).ramType || "-"}</TableCell>}
                           <TableCell>{a.vendorName}</TableCell>
                           <TableCell>{a.purchaseDate}</TableCell>
                           <TableCell>{a.warrantyEndDate}</TableCell>
