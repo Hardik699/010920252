@@ -275,6 +275,7 @@ export default function PCLaptopInfo() {
       headphoneId: "none",
       powerSupplyId: "none",
       ramId: "none",
+      ramId2: "none",
     });
 
     alert(editingItem ? "Updated successfully!" : "Saved successfully!");
