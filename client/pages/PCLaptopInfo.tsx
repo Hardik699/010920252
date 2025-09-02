@@ -627,6 +627,7 @@ export default function PCLaptopInfo() {
                         <TableCell>{a.headphoneId || "-"}</TableCell>
                         <TableCell>{a.powerSupplyId || "-"}</TableCell>
                         <TableCell>{a.ramId || "-"}</TableCell>
+                        <TableCell>{a.ramId2 || "-"}</TableCell>
                         <TableCell>
                           <Button
                             onClick={() => openForm(a)}
