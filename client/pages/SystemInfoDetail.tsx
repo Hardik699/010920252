@@ -175,12 +175,6 @@ export default function SystemInfoDetail() {
     [assets, categoryKey],
   );
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("add") === "1" && !showForm && data) {
-      openForm();
-    }
-  }, [showForm, data, assets]);
 
   const openForm = () => {
     const id = nextWxId(assets, categoryKey);
